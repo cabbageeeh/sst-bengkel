@@ -1,8 +1,8 @@
 <script>
   import { inertia } from '@inertiajs/svelte'
   import { fly, fade } from 'svelte/transition'
-  import { page } from '@inertiajs/svelte'
   import SSTHeader from '../../Components/SSTHeader.svelte'
+  import { Toast } from '../../Components/helper.js'
   
   export let vehicles = []
   export let customers = []
@@ -43,20 +43,33 @@
     })
   }
   
-  function deleteVehicle(id, licensePlate) {
+  async function deleteVehicle(id, licensePlate) {
     if (confirm(`Apakah Anda yakin ingin menghapus kendaraan "${licensePlate}"?`)) {
-      const form = document.createElement('form')
-      form.method = 'POST'
-      form.action = `/vehicles/${id}`
-      
-      const methodInput = document.createElement('input')
-      methodInput.type = 'hidden'
-      methodInput.name = '_method'
-      methodInput.value = 'DELETE'
-      form.appendChild(methodInput)
-      
-      document.body.appendChild(form)
-      form.submit()
+      try {
+        const response = await fetch(`/vehicles/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        })
+
+        if (response.ok) {
+          // Show success toast
+          Toast('Kendaraan berhasil dihapus', 'success')
+
+          // Reload the page to refresh the list
+          setTimeout(() => {
+            window.location.reload()
+          }, 1500)
+        } else {
+          const data = await response.json()
+          // Show error toast
+          Toast(data.error || 'Terjadi kesalahan saat menghapus kendaraan', 'error')
+        }
+      } catch (error) {
+        console.error('Error deleting vehicle:', error)
+        Toast('Terjadi kesalahan jaringan', 'error')
+      }
     }
   }
   

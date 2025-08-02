@@ -336,8 +336,10 @@ class VehicleController {
             await DB.table("vehicles")
                 .where("id", id)
                 .delete();
-            
-            return response.redirect("/vehicles?success=Kendaraan berhasil dihapus");
+
+            return response.json({
+                message: "Kendaraan berhasil dihapus"
+            });
         } catch (error) {
             console.error('Error deleting vehicle:', error);
             return response.status(500).json({
