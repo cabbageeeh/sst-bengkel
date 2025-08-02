@@ -1,26 +1,27 @@
 <script>
-  import { inertia } from '@inertiajs/svelte'
+  import { inertia, router } from '@inertiajs/svelte'
   import { fly, fade } from 'svelte/transition'
   import SSTHeader from '../../Components/SSTHeader.svelte'
   import { Toast } from '../../Components/helper.js'
-  
+
   export let customers = []
   export let pagination = {}
   export let search = ''
   export let success = null
-  
+
   let searchInput = search
   let showSuccess = !!success
-  
+
   function handleSearch() {
-    const url = new URL(window.location)
+    const params = {}
     if (searchInput.trim()) {
-      url.searchParams.set('search', searchInput.trim())
-    } else {
-      url.searchParams.delete('search')
+      params.search = searchInput.trim()
     }
-    url.searchParams.delete('page')
-    window.location.href = url.toString()
+
+    router.get('/customers', params, {
+      preserveState: true,
+      preserveScroll: true
+    })
   }
   
   function formatDate(timestamp) {
@@ -266,6 +267,7 @@
           {#if pagination.current_page > 1}
             <a
               href="?page={pagination.current_page - 1}{search ? '&search=' + encodeURIComponent(search) : ''}"
+              use:inertia
               class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
             >
               Previous
@@ -274,6 +276,7 @@
           {#if pagination.current_page < pagination.total_pages}
             <a
               href="?page={pagination.current_page + 1}{search ? '&search=' + encodeURIComponent(search) : ''}"
+              use:inertia
               class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
             >
               Next
@@ -297,6 +300,7 @@
               {#if pagination.current_page > 1}
                 <a
                   href="?page={pagination.current_page - 1}{search ? '&search=' + encodeURIComponent(search) : ''}"
+                  use:inertia
                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
                 >
                   <span class="sr-only">Previous</span>
@@ -305,7 +309,7 @@
                   </svg>
                 </a>
               {/if}
-              
+
               {#each Array(pagination.total_pages) as _, i}
                 {#if i + 1 === pagination.current_page}
                   <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 text-sm font-medium text-blue-600">
@@ -314,16 +318,18 @@
                 {:else}
                   <a
                     href="?page={i + 1}{search ? '&search=' + encodeURIComponent(search) : ''}"
+                    use:inertia
                     class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
                   >
                     {i + 1}
                   </a>
                 {/if}
               {/each}
-              
+
               {#if pagination.current_page < pagination.total_pages}
                 <a
                   href="?page={pagination.current_page + 1}{search ? '&search=' + encodeURIComponent(search) : ''}"
+                  use:inertia
                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
                 >
                   <span class="sr-only">Next</span>

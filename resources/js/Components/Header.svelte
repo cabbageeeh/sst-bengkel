@@ -114,8 +114,8 @@
             {/if}
           </div>
         {:else}
-          <a href="/login" class="btn-secondary text-sm">Masuk</a>
-          <a href="/register" class="btn-primary text-sm">Daftar</a>
+          <a href="/login" use:inertia class="btn-secondary text-sm">Masuk</a>
+          <a href="/register" use:inertia class="btn-primary text-sm">Daftar</a>
         {/if}
       </div>
       
@@ -184,8 +184,8 @@
               Logout
             </button>
           {:else}
-            <a href="/login" class="flex-1 btn-secondary text-sm py-2">Masuk</a>
-            <a href="/register" class="flex-1 btn-primary text-sm py-2">Daftar</a>
+            <a href="/login" use:inertia class="flex-1 btn-secondary text-sm py-2">Masuk</a>
+            <a href="/register" use:inertia class="flex-1 btn-primary text-sm py-2">Daftar</a>
           {/if}
         </div>
       </div>

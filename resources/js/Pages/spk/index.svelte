@@ -1,32 +1,31 @@
 <script>
-  import { inertia } from '@inertiajs/svelte'
+  import { inertia, router } from '@inertiajs/svelte'
   import { fly, fade } from 'svelte/transition'
   import SSTHeader from '../../Components/SSTHeader.svelte'
-  
+
   export let spks = []
   export let pagination = {}
   export let search = ''
   export let status = ''
   export let success = null
-  
+
   let searchInput = search
   let statusFilter = status
   let showSuccess = !!success
-  
+
   function handleSearch() {
-    const url = new URL(window.location)
+    const params = {}
     if (searchInput.trim()) {
-      url.searchParams.set('search', searchInput.trim())
-    } else {
-      url.searchParams.delete('search')
+      params.search = searchInput.trim()
     }
     if (statusFilter) {
-      url.searchParams.set('status', statusFilter)
-    } else {
-      url.searchParams.delete('status')
+      params.status = statusFilter
     }
-    url.searchParams.delete('page')
-    window.location.href = url.toString()
+
+    router.get('/spk', params, {
+      preserveState: true,
+      preserveScroll: true
+    })
   }
   
   function formatDate(timestamp) {
@@ -270,12 +269,12 @@
       <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4 rounded-lg shadow">
         <div class="flex-1 flex justify-between sm:hidden">
           {#if pagination.current_page > 1}
-            <a href="?page={pagination.current_page - 1}&search={search}&status={status}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            <a href="?page={pagination.current_page - 1}&search={search}&status={status}" use:inertia class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
               Previous
             </a>
           {/if}
           {#if pagination.current_page < pagination.total_pages}
-            <a href="?page={pagination.current_page + 1}&search={search}&status={status}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            <a href="?page={pagination.current_page + 1}&search={search}&status={status}" use:inertia class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
               Next
             </a>
           {/if}
@@ -291,28 +290,28 @@
           <div>
             <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
               {#if pagination.current_page > 1}
-                <a href="?page={pagination.current_page - 1}&search={search}&status={status}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                <a href="?page={pagination.current_page - 1}&search={search}&status={status}" use:inertia class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                   <span class="sr-only">Previous</span>
                   <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                   </svg>
                 </a>
               {/if}
-              
+
               {#each Array(pagination.total_pages) as _, i}
                 {#if i + 1 === pagination.current_page}
                   <span class="relative inline-flex items-center px-4 py-2 border border-purple-500 bg-purple-50 text-sm font-medium text-purple-600">
                     {i + 1}
                   </span>
                 {:else}
-                  <a href="?page={i + 1}&search={search}&status={status}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                  <a href="?page={i + 1}&search={search}&status={status}" use:inertia class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
                     {i + 1}
                   </a>
                 {/if}
               {/each}
-              
+
               {#if pagination.current_page < pagination.total_pages}
-                <a href="?page={pagination.current_page + 1}&search={search}&status={status}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                <a href="?page={pagination.current_page + 1}&search={search}&status={status}" use:inertia class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                   <span class="sr-only">Next</span>
                   <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />

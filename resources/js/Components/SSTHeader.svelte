@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
-  
+  import { inertia } from '@inertiajs/svelte';
+
   let mounted = false;
   let mobileMenuOpen = false;
 
@@ -137,27 +138,27 @@
 <nav class="{position} z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <div class="flex justify-between items-center">
     <div class="text-3xl font-bold">
-      <a href="/" class="text-2xl md:text-3xl font-black gradient-text-modern animate-fade-in-left">SST Bengkel</a>
+      <a href="/" use:inertia class="text-2xl md:text-3xl font-black gradient-text-modern animate-fade-in-left">SST Bengkel</a>
     </div>
     <div class="hidden md:flex space-x-8 items-center">
       <!-- Menu Fitur Utama -->
-      <a href="/customers" class="text-gray-700 hover:text-blue-600 transition-all duration-300 font-medium text-lg relative group">
+      <a href="/customers" use:inertia class="text-gray-700 hover:text-blue-600 transition-all duration-300 font-medium text-lg relative group">
         Pelanggan
         <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
       </a>
-      <a href="/vehicles" class="text-gray-700 hover:text-green-600 transition-all duration-300 font-medium text-lg relative group">
+      <a href="/vehicles" use:inertia class="text-gray-700 hover:text-green-600 transition-all duration-300 font-medium text-lg relative group">
         Kendaraan
         <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-green-600 transition-all duration-300 group-hover:w-full"></span>
       </a>
-      <a href="/spk" class="text-gray-700 hover:text-purple-600 transition-all duration-300 font-medium text-lg relative group">
+      <a href="/spk" use:inertia class="text-gray-700 hover:text-purple-600 transition-all duration-300 font-medium text-lg relative group">
         SPK Digital
         <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-600 transition-all duration-300 group-hover:w-full"></span>
       </a>
-      <a href="/invoices" class="text-gray-700 hover:text-orange-600 transition-all duration-300 font-medium text-lg relative group">
+      <a href="/invoices" use:inertia class="text-gray-700 hover:text-orange-600 transition-all duration-300 font-medium text-lg relative group">
         Invoice
         <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-600 transition-all duration-300 group-hover:w-full"></span>
       </a>
-      <a href="/reports" class="text-gray-700 hover:text-indigo-600 transition-all duration-300 font-medium text-lg relative group">
+      <a href="/reports" use:inertia class="text-gray-700 hover:text-indigo-600 transition-all duration-300 font-medium text-lg relative group">
         Laporan
         <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full"></span>
       </a>
@@ -191,7 +192,7 @@
         <div class="space-y-3">
           <div class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Fitur SST Bengkel</div>
 
-          <a href="/customers" on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
+          <a href="/customers" use:inertia on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
             <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
               <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
@@ -203,7 +204,7 @@
             </div>
           </a>
 
-          <a href="/vehicles" on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
+          <a href="/vehicles" use:inertia on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
             <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
               <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -215,7 +216,7 @@
             </div>
           </a>
 
-          <a href="/spk" on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
+          <a href="/spk" use:inertia on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
             <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
               <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -227,7 +228,7 @@
             </div>
           </a>
 
-          <a href="/invoices" on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
+          <a href="/invoices" use:inertia on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
             <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
               <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
@@ -239,7 +240,7 @@
             </div>
           </a>
 
-          <a href="/reports" on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
+          <a href="/reports" use:inertia on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
             <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
               <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>

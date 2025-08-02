@@ -1,54 +1,45 @@
 <script>
-  import { inertia } from '@inertiajs/svelte'
+  import { inertia, router } from '@inertiajs/svelte'
   import { fly } from 'svelte/transition'
   import SSTHeader from '../../Components/SSTHeader.svelte'
-  
+
   export let customer = {}
-  
+
   let form = {
     name: customer.name || '',
     phone: customer.phone || '',
     email: customer.email || '',
     address: customer.address || ''
   }
-  
+
   let errors = {}
   let loading = false
-  
-  async function handleSubmit() {
+
+  function handleSubmit() {
     if (!validateForm()) {
       return
     }
-    
+
     loading = true
     errors = {}
-    
-    try {
-      const response = await fetch(`/customers/${customer.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(form)
-      })
-      
-      if (response.ok) {
-        window.location.href = '/customers?success=Data pelanggan berhasil diperbarui'
-      } else {
-        const data = await response.json()
-        if (response.status === 422) {
-          errors.general = data.error
-        } else if (response.status === 404) {
-          errors.general = 'Pelanggan tidak ditemukan'
+
+    router.put(`/customers/${customer.id}`, form, {
+      onSuccess: () => {
+        router.visit('/customers', {
+          data: { success: 'Data pelanggan berhasil diperbarui' }
+        })
+      },
+      onError: (errors) => {
+        if (errors.general) {
+          errors.general = errors.general
         } else {
           errors.general = 'Terjadi kesalahan saat memperbarui data'
         }
+      },
+      onFinish: () => {
+        loading = false
       }
-    } catch (error) {
-      errors.general = 'Terjadi kesalahan jaringan'
-    } finally {
-      loading = false
-    }
+    })
   }
   
   function validateForm() {

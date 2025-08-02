@@ -1,46 +1,43 @@
 <script>
-  import { inertia } from '@inertiajs/svelte'
+  import { inertia, router } from '@inertiajs/svelte'
   import { fly } from 'svelte/transition'
   import SSTHeader from '../../Components/SSTHeader.svelte'
-  
+
   let form = {
     name: '',
     phone: '',
     email: '',
     address: ''
   }
-  
+
   let errors = {}
   let loading = false
-  
-  async function handleSubmit() {
+
+  function handleSubmit() {
+    if (!validateForm()) {
+      return
+    }
+
     loading = true
     errors = {}
-    
-    try {
-      const response = await fetch('/customers', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(form)
-      })
-      
-      if (response.ok) {
-        window.location.href = '/customers?success=Pelanggan berhasil ditambahkan'
-      } else {
-        const data = await response.json()
-        if (response.status === 422) {
-          errors.general = data.error
+
+    router.post('/customers', form, {
+      onSuccess: () => {
+        router.visit('/customers', {
+          data: { success: 'Pelanggan berhasil ditambahkan' }
+        })
+      },
+      onError: (errors) => {
+        if (errors.general) {
+          errors.general = errors.general
         } else {
           errors.general = 'Terjadi kesalahan saat menyimpan data'
         }
+      },
+      onFinish: () => {
+        loading = false
       }
-    } catch (error) {
-      errors.general = 'Terjadi kesalahan jaringan'
-    } finally {
-      loading = false
-    }
+    })
   }
   
   function validateForm() {
