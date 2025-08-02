@@ -303,7 +303,10 @@ class InvoiceController {
                 });
             }
 
-            return response.redirect("/invoices?success=Invoice berhasil diperbarui");
+            return response.status(200).json({
+                success: true,
+                message: "Invoice berhasil diperbarui"
+            });
         } catch (error) {
             console.error('Error updating invoice:', error);
             return response.status(500).json({

@@ -2,6 +2,7 @@
   import { inertia, router } from '@inertiajs/svelte'
   import { fly } from 'svelte/transition'
   import SSTHeader from '../../Components/SSTHeader.svelte'
+  import { Toast } from '../../Components/helper.js'
 
   export let invoice = {}
   export let spk = {}
@@ -22,7 +23,7 @@
   $: discountAmount = parseFloat(form.discount_amount || 0)
   $: totalAmount = subtotal + taxAmount - discountAmount
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!validateForm()) {
       return
     }
@@ -30,23 +31,43 @@
     loading = true
     errors = {}
 
-    router.put(`/invoices/${invoice.id}`, form, {
-      onSuccess: () => {
-        router.visit('/invoices', {
-          data: { success: 'Invoice berhasil diperbarui' }
-        })
-      },
-      onError: (errors) => {
-        if (errors.general) {
-          errors.general = errors.general
+    try {
+      const response = await fetch(`/invoices/${invoice.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(form)
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        // Show success toast
+        Toast('Invoice berhasil diperbarui', 'success')
+        
+        // Redirect to invoices list after a short delay
+        setTimeout(() => {
+          window.location.href = '/invoices'
+        }, 1000)
+      } else {
+        // Handle validation errors
+        if (data.error) {
+          errors.general = data.error
+          Toast(data.error, 'error')
         } else {
           errors.general = 'Terjadi kesalahan saat memperbarui data'
+          Toast('Terjadi kesalahan saat memperbarui data', 'error')
         }
-      },
-      onFinish: () => {
-        loading = false
       }
-    })
+    } catch (error) {
+      console.error('Error updating invoice:', error)
+      errors.general = 'Terjadi kesalahan jaringan'
+      Toast('Terjadi kesalahan jaringan', 'error')
+    } finally {
+      loading = false
+    }
   }
   
   function validateForm() {
