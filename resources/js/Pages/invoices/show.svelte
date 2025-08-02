@@ -140,18 +140,19 @@
 
   <!-- Invoice Content -->
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 print:py-4">
-    <!-- Invoice Header -->
-    <div class="bg-white shadow sm:rounded-lg print:shadow-none print:rounded-none mb-8" transition:fly={{ y: 20, duration: 300 }}>
+    <!-- Print Layout Wrapper -->
+    <div class="print-layout bg-white shadow sm:rounded-lg print:shadow-none print:rounded-none mb-8" transition:fly={{ y: 20, duration: 300 }}>
       <div class="px-6 py-8">
-        <!-- Company Header -->
-        <div class="flex justify-between items-start mb-8">
+        <!-- Print Header -->
+        <div class="print-header company-header flex justify-between items-start mb-6">
           <div>
-            <h2 class="text-2xl font-bold text-gray-900">SST Bengkel</h2>
+            <h1 class="text-2xl font-bold text-gray-900">SST Bengkel</h1>
             <p class="text-sm text-gray-600 mt-1">Jl. Contoh No. 123, Jakarta</p>
             <p class="text-sm text-gray-600">Telp: (021) 1234-5678</p>
           </div>
-          <div class="text-right">
-            <h3 class="text-xl font-bold text-orange-600">INVOICE</h3>
+          <div class="text-right invoice-number">
+            <h2 class="text-xl font-bold text-orange-600">INVOICE</h2>
+            <p class="text-lg font-bold text-gray-900">#{invoice.invoice_number}</p>
             <p class="text-sm text-gray-600 mt-1">Tanggal: {formatDate(invoice.invoice_date)}</p>
             {#if invoice.due_date}
               <p class="text-sm text-gray-600">Jatuh Tempo: {formatDate(invoice.due_date)}</p>
@@ -159,96 +160,105 @@
           </div>
         </div>
 
-        <!-- Customer & Invoice Info -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <div>
-            <h4 class="text-sm font-medium text-gray-900 mb-2">Tagihan Kepada:</h4>
-            <div class="text-sm text-gray-600">
-              <p class="font-medium text-gray-900">{invoice.customer_name}</p>
-              {#if invoice.customer_phone}
-                <p>Telp: {invoice.customer_phone}</p>
-              {/if}
-              {#if invoice.customer_email}
-                <p>Email: {invoice.customer_email}</p>
-              {/if}
-              {#if invoice.customer_address}
-                <p class="mt-1">{invoice.customer_address}</p>
-              {/if}
+        <!-- Print Body -->
+        <div class="print-body">
+          <!-- Customer & Vehicle Info Table -->
+          <table class="customer-info w-full mb-6 border-collapse">
+            <tbody>
+              <tr>
+                <td class="w-1/2 align-top pr-4">
+                  <h3 class="text-sm font-medium text-gray-900 mb-2">Tagihan Kepada:</h3>
+                  <div class="text-sm text-gray-700">
+                    <div class="font-medium text-gray-900">{invoice.customer_name}</div>
+                    {#if invoice.customer_phone}
+                      <div>Telp: {invoice.customer_phone}</div>
+                    {/if}
+                    {#if invoice.customer_email}
+                      <div>Email: {invoice.customer_email}</div>
+                    {/if}
+                    {#if invoice.customer_address}
+                      <div class="mt-1">{invoice.customer_address}</div>
+                    {/if}
+                  </div>
+                </td>
+                <td class="w-1/2 align-top pl-4">
+                  <h3 class="text-sm font-medium text-gray-900 mb-2">Detail Kendaraan:</h3>
+                  <div class="text-sm text-gray-700">
+                    <div><span class="font-medium">Plat Nomor:</span> {invoice.license_plate}</div>
+                    <div><span class="font-medium">Kendaraan:</span> {invoice.brand} {invoice.model}</div>
+                    <div><span class="font-medium">SPK:</span> {invoice.spk_number}</div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Service Details -->
+          <div class="service-details mb-6">
+            <h3 class="text-sm font-medium text-gray-900 mb-2">Deskripsi Pekerjaan:</h3>
+            <div class="bg-gray-50 print:bg-gray-100 p-3 rounded-md print:rounded-none border print:border-gray-300">
+              <p class="text-sm text-gray-700 whitespace-pre-wrap">{invoice.service_description}</p>
             </div>
           </div>
-          <div>
-            <h4 class="text-sm font-medium text-gray-900 mb-2">Detail Kendaraan:</h4>
-            <div class="text-sm text-gray-600">
-              <p><span class="font-medium">Plat Nomor:</span> {invoice.license_plate}</p>
-              <p><span class="font-medium">Kendaraan:</span> {invoice.brand} {invoice.model}</p>
-              <p><span class="font-medium">SPK:</span> {invoice.spk_number}</p>
-            </div>
-          </div>
-        </div>
 
-        <!-- Service Description -->
-        <div class="mb-8">
-          <h4 class="text-sm font-medium text-gray-900 mb-2">Deskripsi Pekerjaan:</h4>
-          <div class="bg-gray-50 p-4 rounded-md">
-            <p class="text-sm text-gray-700 whitespace-pre-wrap">{invoice.service_description}</p>
-          </div>
-        </div>
+          <!-- Cost Breakdown Table -->
+          <table class="cost-breakdown w-full border-t border-gray-300 pt-4">
+            <tbody>
+              <tr>
+                <td class="w-2/3"></td>
+                <td class="w-1/3">
+                  <table class="w-full">
+                    <tbody>
+                      <tr class="border-b border-gray-200">
+                        <td class="text-sm text-gray-600 py-1">Subtotal</td>
+                        <td class="text-sm text-gray-900 text-right py-1">{formatCurrency(invoice.subtotal)}</td>
+                      </tr>
+                      {#if invoice.tax_amount > 0}
+                        <tr class="border-b border-gray-200">
+                          <td class="text-sm text-gray-600 py-1">Pajak (PPN)</td>
+                          <td class="text-sm text-gray-900 text-right py-1">{formatCurrency(invoice.tax_amount)}</td>
+                        </tr>
+                      {/if}
+                      {#if invoice.discount_amount > 0}
+                        <tr class="border-b border-gray-200">
+                          <td class="text-sm text-gray-600 py-1">Diskon</td>
+                          <td class="text-sm text-gray-900 text-right py-1">-{formatCurrency(invoice.discount_amount)}</td>
+                        </tr>
+                      {/if}
+                      <tr class="border-t-2 border-gray-400">
+                        <td class="text-base font-bold text-gray-900 py-2">TOTAL</td>
+                        <td class="text-base font-bold text-gray-900 text-right py-2">{formatCurrency(invoice.total_amount)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
-        <!-- Invoice Calculation -->
-        <div class="border-t border-gray-200 pt-6">
-          <div class="flex justify-end">
-            <div class="w-full max-w-md">
-              <dl class="space-y-3">
-                <div class="flex justify-between">
-                  <dt class="text-sm text-gray-600">Subtotal</dt>
-                  <dd class="text-sm text-gray-900">{formatCurrency(invoice.subtotal)}</dd>
-                </div>
-                {#if invoice.tax_amount > 0}
-                  <div class="flex justify-between">
-                    <dt class="text-sm text-gray-600">Pajak (PPN)</dt>
-                    <dd class="text-sm text-gray-900">{formatCurrency(invoice.tax_amount)}</dd>
+          <!-- Payment Status & Notes -->
+          <div class="mt-6 pt-4 border-t border-gray-200">
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="text-sm font-medium text-gray-900">Status Pembayaran:</h4>
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {getStatusBadge(invoice.status)} mt-1 print:border print:border-gray-400">
+                  {getStatusText(invoice.status)}
+                </span>
+                {#if invoice.paid_date}
+                  <div class="mt-2">
+                    <p class="text-xs text-gray-600">Dibayar pada: {formatDate(invoice.paid_date)}</p>
                   </div>
                 {/if}
-                {#if invoice.discount_amount > 0}
-                  <div class="flex justify-between">
-                    <dt class="text-sm text-gray-600">Diskon</dt>
-                    <dd class="text-sm text-gray-900">-{formatCurrency(invoice.discount_amount)}</dd>
-                  </div>
-                {/if}
-                <div class="flex justify-between pt-3 border-t border-gray-200">
-                  <dt class="text-base font-medium text-gray-900">Total</dt>
-                  <dd class="text-base font-bold text-gray-900">{formatCurrency(invoice.total_amount)}</dd>
-                </div>
-              </dl>
-            </div>
-          </div>
-        </div>
-
-        <!-- Payment Status -->
-        <div class="mt-8 pt-6 border-t border-gray-200">
-          <div class="flex justify-between items-center">
-            <div>
-              <h4 class="text-sm font-medium text-gray-900">Status Pembayaran:</h4>
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {getStatusBadge(invoice.status)} mt-1">
-                {getStatusText(invoice.status)}
-              </span>
-            </div>
-            {#if invoice.paid_date}
-              <div class="text-right">
-                <p class="text-sm text-gray-600">Dibayar pada:</p>
-                <p class="text-sm font-medium text-green-600">{formatDate(invoice.paid_date)}</p>
               </div>
-            {/if}
+              {#if invoice.notes}
+                <div class="text-right max-w-md">
+                  <h4 class="text-sm font-medium text-gray-900 mb-1">Catatan:</h4>
+                  <p class="text-xs text-gray-600 whitespace-pre-wrap">{invoice.notes}</p>
+                </div>
+              {/if}
+            </div>
           </div>
-        </div>
-
-        <!-- Notes -->
-        {#if invoice.notes}
-          <div class="mt-6 pt-6 border-t border-gray-200">
-            <h4 class="text-sm font-medium text-gray-900 mb-2">Catatan:</h4>
-            <p class="text-sm text-gray-600 whitespace-pre-wrap">{invoice.notes}</p>
-          </div>
-        {/if}
+         </div>
 
         <!-- Footer -->
         <div class="mt-8 pt-6 border-t border-gray-200 text-center">
@@ -297,21 +307,270 @@
 
 <style>
   @media print {
+    /* Hide web elements */
     .print\:hidden {
       display: none !important;
     }
-    .print\:bg-white {
-      background-color: white !important;
+    
+    /* Reset page layout for print */
+    @page {
+      margin: 1cm;
+      size: A4;
     }
-    .print\:shadow-none {
+    
+    /* Body and container reset */
+    body {
+      font-family: 'Times New Roman', serif;
+      font-size: 12px;
+      line-height: 1.4;
+      margin: 0;
+      padding: 0;
+      background: white !important;
+    }
+    
+    /* Remove web styling */
+    * {
       box-shadow: none !important;
-    }
-    .print\:rounded-none {
       border-radius: 0 !important;
+      background-image: none !important;
     }
-    .print\:py-4 {
-      padding-top: 1rem !important;
-      padding-bottom: 1rem !important;
+    
+    /* Main container */
+    .min-h-screen {
+      min-height: auto !important;
+      background: white !important;
+    }
+    
+    /* Invoice container optimization */
+    .max-w-4xl {
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    
+    /* Invoice content */
+    .bg-white {
+      background: white !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      margin: 0 !important;
+    }
+    
+    /* Typography optimization for print */
+    h1, h2, h3, h4 {
+      color: black !important;
+      page-break-after: avoid;
+      margin-top: 0 !important;
+      margin-bottom: 0.25rem !important;
+    }
+    
+    h1 {
+      font-size: 16px !important;
+      font-weight: bold;
+      line-height: 1.2;
+    }
+    
+    h2 {
+      font-size: 14px !important;
+      font-weight: bold;
+      line-height: 1.2;
+    }
+    
+    h3 {
+      font-size: 12px !important;
+      font-weight: bold;
+      line-height: 1.2;
+    }
+    
+    h4 {
+      font-size: 11px !important;
+      font-weight: bold;
+      line-height: 1.2;
+    }
+    
+    /* Page break control */
+    .print-layout {
+      page-break-inside: avoid;
+      height: auto !important;
+      max-height: 26cm !important; /* A4 height minus margins */
+    }
+    
+    .print-header {
+      page-break-after: avoid;
+      page-break-inside: avoid;
+    }
+    
+    .print-body {
+      page-break-inside: avoid;
+    }
+    
+    .customer-info {
+      page-break-inside: avoid;
+      page-break-after: avoid;
+    }
+    
+    .service-details {
+      page-break-inside: avoid;
+      page-break-after: avoid;
+    }
+    
+    .cost-breakdown {
+      page-break-before: avoid;
+      page-break-inside: avoid;
+    }
+    
+    /* Prevent orphans and widows */
+    p {
+      orphans: 3;
+      widows: 3;
+      page-break-inside: avoid;
+    }
+    
+    /* Grid layout optimization */
+    .grid {
+      display: block !important;
+    }
+    
+    .grid-cols-1,
+    .grid-cols-2,
+    .md\:grid-cols-2 {
+      display: block !important;
+    }
+    
+    /* Spacing optimization */
+    .space-y-3 > * + * {
+      margin-top: 0.5rem !important;
+    }
+    
+    .space-y-8 > * + * {
+      margin-top: 1rem !important;
+    }
+    
+    /* Compact spacing for print */
+    .px-4, .px-6, .px-8,
+    .py-4, .py-6, .py-8,
+    .sm\:px-6, .lg\:px-8 {
+      padding: 0.25rem !important;
+    }
+    
+    .mb-6, .mb-8 {
+      margin-bottom: 0.5rem !important;
+    }
+    
+    .mt-6, .mt-8 {
+      margin-top: 0.5rem !important;
+    }
+    
+    .pt-4, .pt-6 {
+      padding-top: 0.25rem !important;
+    }
+    
+    .pb-4, .pb-6 {
+      padding-bottom: 0.25rem !important;
+    }
+    
+    /* Text size optimization */
+    .text-sm {
+      font-size: 10px !important;
+      line-height: 1.3 !important;
+    }
+    
+    .text-xs {
+      font-size: 9px !important;
+      line-height: 1.2 !important;
+    }
+    
+    .text-base {
+      font-size: 11px !important;
+      line-height: 1.3 !important;
+    }
+    
+    .text-lg {
+      font-size: 12px !important;
+      line-height: 1.3 !important;
+    }
+    
+    /* Table cell padding */
+    td {
+      padding: 0.125rem 0.25rem !important;
+      vertical-align: top;
+    }
+    
+    /* Border optimization */
+    .border-t {
+      border-top: 1px solid #000 !important;
+    }
+    
+    .border-b {
+      border-bottom: 1px solid #000 !important;
+    }
+    
+    .border-t-2 {
+      border-top: 2px solid #000 !important;
+    }
+    
+    /* Table-like layout for customer info */
+    .customer-vehicle-info {
+      display: table;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .customer-vehicle-info > div {
+      display: table-row;
+    }
+    
+    .customer-vehicle-info > div > div {
+      display: table-cell;
+      padding: 0.25rem 0.5rem;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+    
+    /* Cost breakdown table */
+    .cost-breakdown {
+      border-top: 2px solid black;
+      margin-top: 1rem;
+      padding-top: 0.5rem;
+    }
+    
+    /* Final total emphasis */
+    .total-amount {
+      border-top: 2px solid black;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    
+    /* Company header */
+    .company-header {
+      text-align: center;
+      border-bottom: 2px solid black;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    /* Invoice number emphasis */
+    .invoice-number {
+      font-size: 16px;
+      font-weight: bold;
+      text-align: right;
+    }
+    
+    /* Service description box */
+    .service-description {
+      border: 1px solid black;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+      background: white !important;
+    }
+    
+    /* Footer */
+    .invoice-footer {
+      margin-top: 1rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid black;
+      text-align: center;
+      font-size: 10px;
     }
   }
 </style>
