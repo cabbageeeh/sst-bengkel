@@ -1,10 +1,9 @@
-import { Response, Request } from "../../type"; 
-import { view } from "../services/View";
+import { Response, Request } from "../../type";
 
 class Controller {
-    
-    public async index (request : Request,response : Response) { 
-        return response.type("html").send(view("index.html"));
+
+    public async index (request : Request,response : Response) {
+        return response.inertia("Landing");
     }
 }
 
