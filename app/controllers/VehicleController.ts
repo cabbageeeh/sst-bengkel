@@ -182,9 +182,16 @@ class VehicleController {
                 .orderBy('service_date', 'desc')
                 .limit(10);
             
+            // Get SPK records for this vehicle
+            const spkRecords = await DB.from("spk")
+                .where("vehicle_id", id)
+                .orderBy('created_at', 'desc')
+                .limit(10);
+            
             return response.inertia("vehicles/show", {
                 vehicle,
-                serviceRecords
+                serviceRecords,
+                spkRecords
             });
         } catch (error) {
             console.error('Error fetching vehicle:', error);

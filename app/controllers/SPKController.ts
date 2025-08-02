@@ -65,6 +65,8 @@ class SPKController {
 
     public async create(request: Request, response: Response) {
         try {
+            const vehicleId = request.query.vehicle_id as string;
+            
             // Get vehicles with customer info for dropdown
             const vehicles = await DB.from("vehicles")
                 .select(
@@ -74,8 +76,23 @@ class SPKController {
                 .leftJoin("customers", "vehicles.customer_id", "customers.id")
                 .orderBy("customers.name");
 
+            // Get selected vehicle info if vehicle_id is provided
+            let selectedVehicle = null;
+            if (vehicleId) {
+                selectedVehicle = await DB.from("vehicles")
+                    .select(
+                        "vehicles.*",
+                        "customers.name as customer_name"
+                    )
+                    .leftJoin("customers", "vehicles.customer_id", "customers.id")
+                    .where("vehicles.id", vehicleId)
+                    .first();
+            }
+
             return response.inertia("spk/create", {
-                vehicles
+                vehicles,
+                selectedVehicle,
+                preSelectedVehicleId: vehicleId
             });
         } catch (error) {
             console.error('Error loading SPK create page:', error);

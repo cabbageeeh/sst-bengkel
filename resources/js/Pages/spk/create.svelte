@@ -4,9 +4,11 @@
   import SSTHeader from '../../Components/SSTHeader.svelte'
 
   export let vehicles = []
+  export let selectedVehicle = null
+  export let preSelectedVehicleId = null
 
   let form = {
-    vehicle_id: '',
+    vehicle_id: preSelectedVehicleId || '',
     service_description: '',
     estimated_cost: '',
     notes: ''
@@ -144,6 +146,25 @@
           <label for="vehicle_id" class="block text-sm font-medium text-gray-700 mb-2">
             Kendaraan <span class="text-red-500">*</span>
           </label>
+          
+          {#if selectedVehicle}
+            <div class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+              <div class="flex items-center">
+                <svg class="h-5 w-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <p class="text-sm font-medium text-blue-800">
+                    Kendaraan Terpilih: {selectedVehicle.license_plate} - {selectedVehicle.brand} {selectedVehicle.model}
+                  </p>
+                  <p class="text-xs text-blue-600">
+                    Pemilik: {selectedVehicle.customer_name}
+                  </p>
+                </div>
+              </div>
+            </div>
+          {/if}
+          
           <select
             id="vehicle_id"
             bind:value={form.vehicle_id}
