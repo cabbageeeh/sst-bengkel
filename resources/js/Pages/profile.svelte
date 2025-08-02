@@ -1,6 +1,6 @@
 <script>
   import axios from "axios";
-  import Header from "../Components/Header.svelte";
+  import SSTHeader from "../Components/SSTHeader.svelte";
   import { Toast } from "../Components/helper";
   export let user;
 
@@ -80,7 +80,10 @@
   }
 </script>
 
-<Header group="profile" />
+<!-- SST Header -->
+<div class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-['Inter']">
+  <SSTHeader showBackground={false} position="relative" />
+</div>
 
 <div class="max-w-4xl mx-auto p-4">
   <div class="max-w-3xl mx-auto mb-8">

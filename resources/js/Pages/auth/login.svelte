@@ -1,6 +1,7 @@
 <script>
-    import { inertia,router } from '@inertiajs/svelte' 
-    import LajuIcon from '../../Components/LajuIcon.svelte'; 
+    import { inertia,router } from '@inertiajs/svelte'
+    import LajuIcon from '../../Components/LajuIcon.svelte';
+    import SSTHeader from '../../Components/SSTHeader.svelte';
   
     let form = {
       email: '',
@@ -18,8 +19,13 @@
  
   </script>
   
+  <!-- SST Header -->
+  <div class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-['Inter']">
+    <SSTHeader showBackground={false} position="relative" />
+  </div>
+
   <section class="bg-gray-50 dark:bg-gray-900">
-    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen lg:py-0">
+    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto min-h-screen lg:py-0">
         <div  class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
             <LajuIcon></LajuIcon>
         </div>

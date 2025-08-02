@@ -4,6 +4,9 @@ import HomeController from "../app/controllers/HomeController";
 import AssetController from "../app/controllers/AssetController";
 import CustomerController from "../app/controllers/CustomerController";
 import VehicleController from "../app/controllers/VehicleController";
+import SPKController from "../app/controllers/SPKController";
+import InvoiceController from "../app/controllers/InvoiceController";
+import ReportController from "../app/controllers/ReportController";
 import HyperExpress from 'hyper-express';
 
 const Route = new HyperExpress.Router();
@@ -75,6 +78,36 @@ Route.get("/vehicles/:id", VehicleController.show);
 Route.get("/vehicles/:id/edit", VehicleController.edit);
 Route.put("/vehicles/:id", VehicleController.update);
 Route.delete("/vehicles/:id", VehicleController.destroy);
+
+/**
+ * SPK (Surat Perintah Kerja) Management Routes
+ */
+Route.get("/spk", SPKController.index);
+Route.get("/spk/create", SPKController.create);
+Route.post("/spk", SPKController.store);
+Route.get("/spk/:id", SPKController.show);
+Route.get("/spk/:id/edit", SPKController.edit);
+Route.put("/spk/:id", SPKController.update);
+Route.delete("/spk/:id", SPKController.destroy);
+
+/**
+ * Invoice Management Routes
+ */
+Route.get("/invoices", InvoiceController.index);
+Route.get("/invoices/create", InvoiceController.create);
+Route.post("/invoices", InvoiceController.store);
+Route.get("/invoices/:id", InvoiceController.show);
+Route.get("/invoices/:id/edit", InvoiceController.edit);
+Route.put("/invoices/:id", InvoiceController.update);
+Route.delete("/invoices/:id", InvoiceController.destroy);
+
+/**
+ * Reports Routes
+ */
+Route.get("/reports", ReportController.index);
+Route.get("/reports/revenue", ReportController.revenue);
+Route.get("/reports/services", ReportController.services);
+Route.get("/reports/customers", ReportController.customers);
 
 /**
  * Protected Routes

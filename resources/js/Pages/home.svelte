@@ -3,7 +3,7 @@
   import { inertia } from '@inertiajs/svelte'
   import { fly, fade } from 'svelte/transition'
   import { page } from '@inertiajs/svelte'
-  import Header from '../Components/Header.svelte'
+  import SSTHeader from '../Components/SSTHeader.svelte'
   
   let features = [
     {
@@ -24,7 +24,10 @@
   ]
 </script>
 
-<Header group="home" />
+<!-- SST Header -->
+<div class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-['Inter']">
+  <SSTHeader showBackground={false} position="relative" />
+</div>
 
 <!-- Hero Section -->
 <div class="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">

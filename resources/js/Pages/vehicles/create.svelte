@@ -1,6 +1,7 @@
 <script>
   import { inertia } from '@inertiajs/svelte'
   import { fly } from 'svelte/transition'
+  import SSTHeader from '../../Components/SSTHeader.svelte'
   
   export let customers = []
   export let selectedCustomer = null
@@ -96,8 +97,13 @@
   <title>Tambah Kendaraan - SST Bengkel</title>
 </svelte:head>
 
+<!-- SST Header -->
+<div class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-['Inter']">
+  <SSTHeader showBackground={false} position="relative" />
+</div>
+
 <div class="min-h-screen bg-gray-50">
-  <!-- Header -->
+  <!-- Page Header -->
   <div class="bg-white shadow">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center py-6">
