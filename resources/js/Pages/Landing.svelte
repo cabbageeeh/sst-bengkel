@@ -1,12 +1,21 @@
 <script>
   let scrollY = 0;
   let mounted = false;
+  let mobileMenuOpen = false;
 
   import { onMount } from 'svelte';
 
   onMount(() => {
     mounted = true;
   });
+
+  function toggleMobileMenu() {
+    mobileMenuOpen = !mobileMenuOpen;
+  }
+
+  function closeMobileMenu() {
+    mobileMenuOpen = false;
+  }
 </script>
 
 <svelte:head>
@@ -281,28 +290,120 @@
           <span class="text-2xl md:text-3xl font-black gradient-text-modern animate-fade-in-left">SST Bengkel</span>
         </div>
         <div class="hidden md:flex space-x-8 items-center">
-          <a href="#features" class="text-gray-700 hover:text-blue-600 transition-all duration-300 font-medium text-lg relative group">
-            Fitur
+          <!-- Menu Fitur Utama -->
+          <a href="/customers" class="text-gray-700 hover:text-blue-600 transition-all duration-300 font-medium text-lg relative group">
+            Pelanggan
             <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
           </a>
-          <a href="#benefits" class="text-gray-700 hover:text-blue-600 transition-all duration-300 font-medium text-lg relative group">
-            Manfaat
-            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+          <a href="/vehicles" class="text-gray-700 hover:text-green-600 transition-all duration-300 font-medium text-lg relative group">
+            Kendaraan
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-green-600 transition-all duration-300 group-hover:w-full"></span>
           </a>
-          <a href="#contact" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 btn-modern animate-pulse-glow">
-            Hubungi Kami
+          <a href="/spk" class="text-gray-700 hover:text-purple-600 transition-all duration-300 font-medium text-lg relative group">
+            SPK Digital
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-600 transition-all duration-300 group-hover:w-full"></span>
+          </a>
+          <a href="/invoices" class="text-gray-700 hover:text-orange-600 transition-all duration-300 font-medium text-lg relative group">
+            Invoice
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-600 transition-all duration-300 group-hover:w-full"></span>
+          </a>
+          <a href="/reports" class="text-gray-700 hover:text-indigo-600 transition-all duration-300 font-medium text-lg relative group">
+            Laporan
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full"></span>
           </a>
         </div>
 
         <!-- Mobile Menu Button -->
         <div class="md:hidden">
-          <button class="text-gray-700 hover:text-blue-600 transition-colors duration-300" aria-label="Menu">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-            </svg>
+          <button
+            on:click={toggleMobileMenu}
+            class="text-gray-700 hover:text-blue-600 transition-colors duration-300"
+            aria-label="Menu"
+          >
+            {#if mobileMenuOpen}
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            {:else}
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            {/if}
           </button>
         </div>
       </div>
+
+      <!-- Mobile Menu -->
+      {#if mobileMenuOpen}
+        <div class="md:hidden absolute top-full left-0 right-0 bg-white shadow-xl border-t border-gray-100 z-50">
+          <div class="px-4 py-6 space-y-4">
+            <!-- Mobile Fitur Section -->
+            <div class="space-y-3">
+              <div class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Fitur SST Bengkel</div>
+
+              <a href="/customers" on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
+                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-medium text-gray-900">Manajemen Pelanggan</div>
+                  <div class="text-sm text-gray-500">Kelola data pelanggan</div>
+                </div>
+              </a>
+
+              <a href="/vehicles" on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
+                <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-medium text-gray-900">Manajemen Kendaraan</div>
+                  <div class="text-sm text-gray-500">Database kendaraan & tracking</div>
+                </div>
+              </a>
+
+              <a href="/spk" on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
+                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-medium text-gray-900">SPK Digital</div>
+                  <div class="text-sm text-gray-500">Surat Perintah Kerja otomatis</div>
+                </div>
+              </a>
+
+              <a href="/invoices" on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
+                <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-medium text-gray-900">Invoice Otomatis</div>
+                  <div class="text-sm text-gray-500">Pembuatan nota otomatis</div>
+                </div>
+              </a>
+
+              <a href="/reports" on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
+                <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-medium text-gray-900">Laporan Real-time</div>
+                  <div class="text-sm text-gray-500">Dashboard & analytics</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      {/if}
     </nav>
 
     <!-- Main Hero Content -->
@@ -328,12 +429,31 @@
         </div>
 
         <div class="opacity-0 {mounted ? 'animate-fade-in-up delay-400' : ''}">
-          <div class="flex justify-center space-x-6 flex-wrap gap-4 mb-16">
-            <a href="#features" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-bold text-lg shadow-xl hover:shadow-2xl hover:-translate-y-2 btn-modern transform">
-              🚀 Lihat Fitur Lengkap
+          <div class="flex justify-center space-x-6 flex-wrap gap-4 mb-12">
+            <a href="/customers" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-bold text-lg shadow-xl hover:shadow-2xl hover:-translate-y-2 btn-modern transform">
+              🚀 Mulai Kelola Bengkel
             </a>
-            <a href="#benefits" class="glass-card text-gray-800 px-8 py-4 rounded-full hover:bg-white/80 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 border border-white/30">
-              📊 Manfaat untuk Bengkel
+            <a href="#features" class="glass-card text-gray-800 px-8 py-4 rounded-full hover:bg-white/80 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 border border-white/30">
+              📊 Lihat Fitur Lengkap
+            </a>
+          </div>
+
+          <!-- Quick Access Buttons -->
+          <div class="flex justify-center space-x-4 flex-wrap gap-3 mb-16">
+            <a href="/customers" class="bg-white/80 backdrop-blur-sm text-blue-600 px-6 py-2 rounded-full hover:bg-white transition-all duration-300 font-medium shadow-md hover:shadow-lg border border-blue-200">
+              👥 Pelanggan
+            </a>
+            <a href="/vehicles" class="bg-white/80 backdrop-blur-sm text-green-600 px-6 py-2 rounded-full hover:bg-white transition-all duration-300 font-medium shadow-md hover:shadow-lg border border-green-200">
+              🚗 Kendaraan
+            </a>
+            <a href="/spk" class="bg-white/80 backdrop-blur-sm text-purple-600 px-6 py-2 rounded-full hover:bg-white transition-all duration-300 font-medium shadow-md hover:shadow-lg border border-purple-200">
+              📝 SPK Digital
+            </a>
+            <a href="/invoices" class="bg-white/80 backdrop-blur-sm text-yellow-600 px-6 py-2 rounded-full hover:bg-white transition-all duration-300 font-medium shadow-md hover:shadow-lg border border-yellow-200">
+              💰 Invoice
+            </a>
+            <a href="/reports" class="bg-white/80 backdrop-blur-sm text-red-600 px-6 py-2 rounded-full hover:bg-white transition-all duration-300 font-medium shadow-md hover:shadow-lg border border-red-200">
+              📊 Laporan
             </a>
           </div>
         </div>
@@ -364,7 +484,7 @@
       </div>
 
       <!-- Benefits Section -->
-      <div id="benefits" class="mt-32 px-4 sm:px-6 lg:px-8">
+      <div id="why-choose" class="mt-32 px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-20">
           <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">
             Mengapa Memilih <span class="gradient-text-modern">SST Bengkel</span>?
@@ -499,8 +619,8 @@
           <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed font-medium">
             Proses yang sederhana namun powerful untuk meningkatkan efisiensi bengkel Anda secara signifikan.
           </p>
-          <a href="#contact" class="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-bold text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 btn-modern">
-            <span>Pelajari Lebih Lanjut</span>
+          <a href="/customers" class="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-bold text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 btn-modern">
+            <span>Mulai Sekarang</span>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
             </svg>
@@ -713,7 +833,7 @@
       </div>
 
       <!-- CTA Section -->
-      <div id="contact" class="mt-32 px-4 sm:px-6 lg:px-8">
+      <div id="cta" class="mt-32 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto">
           <!-- Main CTA -->
           <div class="relative">

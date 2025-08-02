@@ -1,7 +1,9 @@
-import AuthController from "../app/controllers/AuthController"; 
+import AuthController from "../app/controllers/AuthController";
 import Auth from "../app/middlewares/auth"
 import HomeController from "../app/controllers/HomeController";
 import AssetController from "../app/controllers/AssetController";
+import CustomerController from "../app/controllers/CustomerController";
+import VehicleController from "../app/controllers/VehicleController";
 import HyperExpress from 'hyper-express';
 
 const Route = new HyperExpress.Router();
@@ -47,6 +49,32 @@ Route.get("/forgot-password", AuthController.forgotPasswordPage);
 Route.post("/forgot-password", AuthController.sendResetPassword);
 Route.get("/reset-password/:id", AuthController.resetPasswordPage);
 Route.post("/reset-password", AuthController.resetPassword);
+
+/**
+ * SST Bengkel Public Routes
+ * These routes are accessible without authentication for public access
+ * ------------------------------------------------
+ * Customer Management Routes
+ */
+Route.get("/customers", CustomerController.index);
+Route.get("/customers/create", CustomerController.create);
+Route.post("/customers", CustomerController.store);
+Route.get("/customers/:id", CustomerController.show);
+Route.get("/customers/:id/edit", CustomerController.edit);
+Route.put("/customers/:id", CustomerController.update);
+Route.delete("/customers/:id", CustomerController.destroy);
+
+/**
+ * Vehicle Management Routes
+ */
+Route.get("/vehicles", VehicleController.index);
+Route.get("/vehicles/create", VehicleController.create);
+Route.post("/vehicles", VehicleController.store);
+Route.get("/vehicles/search", VehicleController.search);
+Route.get("/vehicles/:id", VehicleController.show);
+Route.get("/vehicles/:id/edit", VehicleController.edit);
+Route.put("/vehicles/:id", VehicleController.update);
+Route.delete("/vehicles/:id", VehicleController.destroy);
 
 /**
  * Protected Routes
