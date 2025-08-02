@@ -2,7 +2,7 @@ import { Response, Request } from "../../type";
 import DB from "../services/DB";
 import { v4 as uuidv4 } from 'uuid';
 
-class Controller {
+class InvoiceController {
 
     public async index(request: Request, response: Response) {
         try {
@@ -97,7 +97,7 @@ class Controller {
                 tax_amount,
                 discount_amount,
                 notes
-            } = request.body;
+            } = await request.json();
 
             // Validate required fields
             if (!spk_id) {
@@ -124,7 +124,23 @@ class Controller {
             const totalAmount = subtotal + taxAmt - discountAmt;
 
             // Generate invoice number
-            const invoiceNumber = await this.generateInvoiceNumber();
+            const currentDate = new Date();
+            const year = currentDate.getFullYear();
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+
+            // Get the last invoice number for this month
+            const lastInvoice = await DB.from("invoices")
+                .where("invoice_number", "like", `INV-${year}${month}%`)
+                .orderBy("invoice_number", "desc")
+                .first();
+
+            let sequence = 1;
+            if (lastInvoice) {
+                const lastSequence = parseInt(lastInvoice.invoice_number.split('-')[2]);
+                sequence = lastSequence + 1;
+            }
+
+            const invoiceNumber = `INV-${year}${month}-${String(sequence).padStart(4, '0')}`;
             const now = Date.now();
 
             const invoiceData = {
@@ -137,7 +153,7 @@ class Controller {
                 total_amount: totalAmount,
                 status: 'draft',
                 invoice_date: now,
-                notes,
+                notes: notes?.trim() || null,
                 created_at: now,
                 updated_at: now
             };
@@ -245,7 +261,7 @@ class Controller {
                 discount_amount,
                 status,
                 notes
-            } = request.body;
+            } = await request.json();
 
             // Get current invoice to recalculate total
             const currentInvoice = await DB.from("invoices")
@@ -268,7 +284,7 @@ class Controller {
                 discount_amount: discountAmt,
                 total_amount: totalAmount,
                 status,
-                notes,
+                notes: notes?.trim() || null,
                 updated_at: Date.now()
             };
 
@@ -319,25 +335,7 @@ class Controller {
         }
     }
 
-    private async generateInvoiceNumber(): Promise<string> {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        
-        // Get the last invoice number for this month
-        const lastInvoice = await DB.from("invoices")
-            .where("invoice_number", "like", `INV-${year}${month}%`)
-            .orderBy("invoice_number", "desc")
-            .first();
 
-        let sequence = 1;
-        if (lastInvoice) {
-            const lastSequence = parseInt(lastInvoice.invoice_number.split('-')[2]);
-            sequence = lastSequence + 1;
-        }
-
-        return `INV-${year}${month}-${String(sequence).padStart(4, '0')}`;
-    }
 }
 
-export default new Controller();
+export default new InvoiceController();

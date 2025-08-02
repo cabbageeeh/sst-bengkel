@@ -2,7 +2,7 @@ import { Response, Request } from "../../type";
 import DB from "../services/DB";
 import { v4 as uuidv4 } from 'uuid';
 
-class Controller {
+class SPKController {
 
     public async index(request: Request, response: Response) {
         try {
@@ -92,27 +92,54 @@ class Controller {
                 service_description,
                 estimated_cost,
                 notes
-            } = request.body;
+            } = await request.json();
 
             // Validate required fields
             if (!vehicle_id || !service_description) {
-                return response.status(400).json({
+                return response.status(422).json({
                     error: "Vehicle dan deskripsi servis harus diisi"
                 });
             }
 
+            // Check if vehicle exists
+            const vehicle = await DB.from("vehicles")
+                .where("id", vehicle_id)
+                .first();
+
+            if (!vehicle) {
+                return response.status(422).json({
+                    error: "Kendaraan tidak ditemukan"
+                });
+            }
+
             // Generate SPK number
-            const spkNumber = await this.generateSPKNumber();
+            const currentDate = new Date();
+            const year = currentDate.getFullYear();
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+
+            // Get the last SPK number for this month
+            const lastSPK = await DB.from("spk")
+                .where("spk_number", "like", `SPK-${year}${month}%`)
+                .orderBy("spk_number", "desc")
+                .first();
+
+            let sequence = 1;
+            if (lastSPK) {
+                const lastSequence = parseInt(lastSPK.spk_number.split('-')[2]);
+                sequence = lastSequence + 1;
+            }
+
+            const spkNumber = `SPK-${year}${month}-${String(sequence).padStart(4, '0')}`;
             const now = Date.now();
 
             const spkData = {
                 id: uuidv4(),
                 vehicle_id,
                 spk_number: spkNumber,
-                service_description,
-                estimated_cost: estimated_cost || 0,
+                service_description: service_description.trim(),
+                estimated_cost: estimated_cost ? parseFloat(estimated_cost) : 0,
                 status: 'draft',
-                notes,
+                notes: notes?.trim() || null,
                 created_at: now,
                 updated_at: now
             };
@@ -216,15 +243,15 @@ class Controller {
                 actual_cost,
                 status,
                 notes
-            } = request.body;
+            } = await request.json();
 
             const updateData = {
                 vehicle_id,
-                service_description,
-                estimated_cost,
-                actual_cost,
+                service_description: service_description?.trim(),
+                estimated_cost: estimated_cost ? parseFloat(estimated_cost) : null,
+                actual_cost: actual_cost ? parseFloat(actual_cost) : null,
                 status,
-                notes,
+                notes: notes?.trim() || null,
                 updated_at: Date.now()
             };
 
@@ -270,25 +297,7 @@ class Controller {
         }
     }
 
-    private async generateSPKNumber(): Promise<string> {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        
-        // Get the last SPK number for this month
-        const lastSPK = await DB.from("spk")
-            .where("spk_number", "like", `SPK-${year}${month}%`)
-            .orderBy("spk_number", "desc")
-            .first();
 
-        let sequence = 1;
-        if (lastSPK) {
-            const lastSequence = parseInt(lastSPK.spk_number.split('-')[2]);
-            sequence = lastSequence + 1;
-        }
-
-        return `SPK-${year}${month}-${String(sequence).padStart(4, '0')}`;
-    }
 }
 
-export default new Controller();
+export default new SPKController();
