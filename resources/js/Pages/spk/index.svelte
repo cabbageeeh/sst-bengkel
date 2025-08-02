@@ -2,6 +2,7 @@
   import { inertia, router } from '@inertiajs/svelte'
   import { fly, fade } from 'svelte/transition'
   import SSTHeader from '../../Components/SSTHeader.svelte'
+  import { Toast } from '../../Components/helper.js'
 
   export let spks = []
   export let pagination = {}
@@ -63,6 +64,44 @@
       'cancelled': 'Dibatalkan'
     }
     return texts[status] || status
+  }
+  
+  async function deleteSPK(spk) {
+    let confirmMessage = `Apakah Anda yakin ingin menghapus SPK "${spk.spk_number}"?`;
+    
+    // Note: We could add invoice count check here in the future
+    // For now, we'll show a general warning about related data
+    confirmMessage += '\n\nPeringatan: Semua data SPK items dan invoice yang terkait akan ikut terhapus secara permanen.';
+    
+    if (confirm(confirmMessage)) {
+      try {
+        const response = await fetch(`/spk/${spk.id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include'
+        })
+        
+        const data = await response.json()
+        
+        if (response.ok) {
+          // Show success toast
+          Toast(data.message || 'SPK berhasil dihapus', 'success')
+          
+          // Refresh the page to update the list
+          setTimeout(() => {
+            window.location.reload()
+          }, 1000)
+        } else {
+          // Show error toast
+          Toast(data.error || 'Terjadi kesalahan saat menghapus SPK', 'error')
+        }
+      } catch (error) {
+        console.error('Error deleting SPK:', error)
+        Toast('Terjadi kesalahan jaringan', 'error')
+      }
+    }
   }
   
   // Auto hide success message
@@ -235,6 +274,12 @@
                     >
                       Edit
                     </a>
+                    <button
+                      on:click={() => deleteSPK(spk)}
+                      class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    >
+                      Hapus
+                    </button>
                   </div>
                 </div>
               </div>

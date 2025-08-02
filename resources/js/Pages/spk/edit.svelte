@@ -2,6 +2,7 @@
   import { inertia, router } from '@inertiajs/svelte'
   import { fly } from 'svelte/transition'
   import SSTHeader from '../../Components/SSTHeader.svelte'
+  import { Toast } from '../../Components/helper.js'
 
   export let spk = {}
   export let vehicles = []
@@ -18,7 +19,7 @@
   let errors = {}
   let loading = false
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!validateForm()) {
       return
     }
@@ -26,23 +27,43 @@
     loading = true
     errors = {}
 
-    router.put(`/spk/${spk.id}`, form, {
-      onSuccess: () => {
-        router.visit('/spk', {
-          data: { success: 'SPK berhasil diperbarui' }
-        })
-      },
-      onError: (errors) => {
-        if (errors.general) {
-          errors.general = errors.general
+    try {
+      const response = await fetch(`/spk/${spk.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(form)
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        // Show success toast
+        Toast('SPK berhasil diperbarui', 'success')
+        
+        // Redirect to SPK list after a short delay
+        setTimeout(() => {
+          window.location.href = '/spk'
+        }, 1000)
+      } else {
+        // Handle validation errors
+        if (data.error) {
+          errors.general = data.error
+          Toast(data.error, 'error')
         } else {
           errors.general = 'Terjadi kesalahan saat memperbarui data'
+          Toast('Terjadi kesalahan saat memperbarui data', 'error')
         }
-      },
-      onFinish: () => {
-        loading = false
       }
-    })
+    } catch (error) {
+      console.error('Error updating SPK:', error)
+      errors.general = 'Terjadi kesalahan jaringan'
+      Toast('Terjadi kesalahan jaringan', 'error')
+    } finally {
+      loading = false
+    }
   }
   
   function validateForm() {
@@ -159,6 +180,14 @@
           </nav>
           <h1 class="mt-2 text-3xl font-bold text-gray-900">Edit SPK {spk.spk_number}</h1>
           <p class="mt-1 text-sm text-gray-600">Perbarui informasi Surat Perintah Kerja</p>
+          {#if spk.license_plate}
+            <div class="mt-2 flex items-center text-sm text-gray-500">
+              <svg class="flex-shrink-0 mr-1.5 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1z" clip-rule="evenodd" />
+              </svg>
+              {spk.license_plate} - {spk.brand} {spk.model} ({spk.year}) | {spk.customer_name}
+            </div>
+          {/if}
         </div>
       </div>
     </div>

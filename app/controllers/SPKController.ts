@@ -220,7 +220,19 @@ class SPKController {
             const { id } = request.params;
             
             const spk = await DB.from("spk")
-                .where("id", id)
+                .select(
+                    "spk.*",
+                    "vehicles.license_plate",
+                    "vehicles.brand",
+                    "vehicles.model",
+                    "vehicles.year",
+                    "customers.name as customer_name",
+                    "customers.phone as customer_phone",
+                    "customers.email as customer_email"
+                )
+                .leftJoin("vehicles", "spk.vehicle_id", "vehicles.id")
+                .leftJoin("customers", "vehicles.customer_id", "customers.id")
+                .where("spk.id", id)
                 .first();
             
             if (!spk) {
@@ -282,7 +294,10 @@ class SPKController {
                 });
             }
 
-            return response.redirect("/spk?success=SPK berhasil diperbarui");
+            return response.status(200).json({
+                success: true,
+                message: "SPK berhasil diperbarui"
+            });
         } catch (error) {
             console.error('Error updating SPK:', error);
             return response.status(500).json({
@@ -295,17 +310,53 @@ class SPKController {
         try {
             const { id } = request.params;
 
-            const deleted = await DB.from("spk")
+            const spk = await DB.from("spk")
                 .where("id", id)
-                .del();
+                .first();
 
-            if (!deleted) {
+            if (!spk) {
                 return response.status(404).json({
                     error: "SPK tidak ditemukan"
                 });
             }
 
-            return response.redirect("/spk?success=SPK berhasil dihapus");
+            // Get invoice count for response message
+            const invoiceCountResult = await DB.from("invoices")
+                .where("spk_id", id)
+                .count('* as total')
+                .first();
+
+            const invoiceCount = Number((invoiceCountResult as any).total || 0);
+
+            // Use database transaction for cascade delete
+            await DB.transaction(async (trx) => {
+                // Enable foreign key constraints (important for SQLite)
+                await trx.raw('PRAGMA foreign_keys = ON');
+
+                // Delete SPK - foreign key constraints will handle cascade
+                const deletedRows = await trx.table("spk")
+                    .where("id", id)
+                    .delete();
+
+                if (deletedRows === 0) {
+                    throw new Error("SPK not found or already deleted");
+                }
+            });
+
+            // Prepare success message based on invoice count
+            let message = "SPK berhasil dihapus";
+            if (invoiceCount > 0) {
+                message = `SPK berhasil dihapus beserta ${invoiceCount} invoice yang terkait`;
+            }
+
+            return response.status(200).json({
+                success: true,
+                message: message,
+                data: {
+                    id,
+                    deletedInvoices: invoiceCount
+                }
+            });
         } catch (error) {
             console.error('Error deleting SPK:', error);
             return response.status(500).json({
