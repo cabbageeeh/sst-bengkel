@@ -23,12 +23,11 @@
 }
 
 @layer components {
- 
-  
+
   .card-hover {
     @apply transition-all duration-300 hover:shadow-soft hover:-translate-y-1;
   }
-  
+
   .nav-link {
     @apply px-4 py-2 text-gray-600 dark:text-gray-200 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-300;
   }
@@ -36,36 +35,77 @@
   .nav-link.active {
     @apply bg-primary-50 dark:bg-gray-800 text-primary-600;
   }
- 
+
   .gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-400;
   }
-  
+
+  .gradient-text-hero {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 via-blue-600 to-primary-500;
+  }
+
   .mobile-nav-link {
     @apply block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50;
   }
-  
+
   .mobile-nav-link.active {
     @apply text-primary-600 font-semibold;
   }
 
   .btn-primary {
-    @apply bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 
-           transition-all duration-300 active:bg-primary-800 
+    @apply bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700
+           transition-all duration-300 active:bg-primary-800
            disabled:opacity-50 disabled:cursor-not-allowed
-           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
+           shadow-lg hover:shadow-xl hover:-translate-y-0.5 font-semibold;
   }
 
   .btn-secondary {
-    @apply bg-white text-gray-900 px-4 py-2 rounded-lg border border-gray-300
-           hover:bg-gray-50 transition-all duration-300 active:bg-gray-100
+    @apply bg-white text-gray-700 px-6 py-3 rounded-lg border border-gray-300
+           hover:bg-gray-50 hover:border-primary-400 hover:text-primary-600
+           transition-all duration-300 active:bg-gray-100
            disabled:opacity-50 disabled:cursor-not-allowed
-           focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+           focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2
+           shadow-md hover:shadow-lg hover:-translate-y-0.5 font-semibold;
   }
 
   .card {
     @apply bg-white rounded-xl shadow-soft p-6 transition-all duration-300
            shadow-lg hover:shadow-xl hover:-translate-y-0.5;
+  }
+
+  .card-modern {
+    @apply bg-white/80 backdrop-blur-sm rounded-xl shadow-soft p-6
+           transition-all duration-300 border border-gray-100
+           hover:shadow-xl hover:-translate-y-1 hover:border-primary-200
+           hover:bg-white/90;
+  }
+
+  .feature-card {
+    @apply p-6 rounded-xl bg-white shadow-lg border border-gray-100
+           hover:border-primary-200 transition-all duration-300
+           hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02];
+  }
+
+  .stats-card {
+    @apply p-6 text-center transition-all duration-300
+           hover:bg-primary-50/50 hover:scale-105;
+  }
+
+  .workflow-step {
+    @apply text-center transition-all duration-300 hover:scale-105;
+  }
+
+  .hero-gradient {
+    @apply bg-gradient-to-br from-primary-50 via-blue-50 to-primary-100;
+  }
+
+  .modern-shadow {
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04);
+  }
+
+  .glow-effect {
+    @apply hover:shadow-lg hover:shadow-primary-500/25 transition-all duration-300;
   }
 
   /* Custom scrollbar for side menu */
