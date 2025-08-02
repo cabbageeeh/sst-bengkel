@@ -9,7 +9,13 @@ const config: { [key: string]: Knex.Config } = {
     connection: {
       filename: "./dev.sqlite3"
     },
-    useNullAsDefault : true
+    useNullAsDefault: true,
+    pool: {
+      afterCreate: (conn: any, cb: any) => {
+        conn.pragma('foreign_keys = ON');
+        cb();
+      }
+    }
   },
 
   production: {
@@ -17,7 +23,13 @@ const config: { [key: string]: Knex.Config } = {
     connection: {
       filename: "./production.sqlite3"
     },
-    useNullAsDefault : true
+    useNullAsDefault: true,
+    pool: {
+      afterCreate: (conn: any, cb: any) => {
+        conn.pragma('foreign_keys = ON');
+        cb();
+      }
+    }
   },
  
  

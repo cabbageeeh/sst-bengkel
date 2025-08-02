@@ -263,7 +263,7 @@ class Controller {
             const discountAmt = parseFloat(discount_amount) || 0;
             const totalAmount = subtotal + taxAmt - discountAmt;
 
-            const updateData = {
+            const updateData: any = {
                 tax_amount: taxAmt,
                 discount_amount: discountAmt,
                 total_amount: totalAmount,

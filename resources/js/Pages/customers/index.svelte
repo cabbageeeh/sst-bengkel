@@ -1,8 +1,8 @@
 <script>
   import { inertia } from '@inertiajs/svelte'
   import { fly, fade } from 'svelte/transition'
-  import { page } from '@inertiajs/svelte'
   import SSTHeader from '../../Components/SSTHeader.svelte'
+  import { Toast } from '../../Components/helper.js'
   
   export let customers = []
   export let pagination = {}
@@ -31,20 +31,38 @@
     })
   }
   
-  function deleteCustomer(id, name) {
-    if (confirm(`Apakah Anda yakin ingin menghapus pelanggan "${name}"?`)) {
-      const form = document.createElement('form')
-      form.method = 'POST'
-      form.action = `/customers/${id}`
-      
-      const methodInput = document.createElement('input')
-      methodInput.type = 'hidden'
-      methodInput.name = '_method'
-      methodInput.value = 'DELETE'
-      form.appendChild(methodInput)
-      
-      document.body.appendChild(form)
-      form.submit()
+  async function deleteCustomer(id, name, vehicleCount = 0) {
+    let confirmMessage = `Apakah Anda yakin ingin menghapus pelanggan "${name}"?`;
+
+    if (vehicleCount > 0) {
+      confirmMessage = `Apakah Anda yakin ingin menghapus pelanggan "${name}" beserta ${vehicleCount} kendaraan yang terkait?\n\nPeringatan: Semua data kendaraan, service record, SPK, dan invoice yang terkait akan ikut terhapus secara permanen.`;
+    }
+
+    if (confirm(confirmMessage)) {
+      try {
+        const response = await fetch(`/customers/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        })
+
+        const data = await response.json()
+
+        if (response.ok) {
+          // Show success toast
+          Toast(data.message || 'Pelanggan berhasil dihapus', 'success')
+
+          // Remove customer from UI
+          customers = customers.filter(customer => customer.id !== id)
+        } else {
+          // Show error toast
+          Toast(data.error || 'Terjadi kesalahan saat menghapus pelanggan', 'error')
+        }
+      } catch (error) {
+        console.error('Error deleting customer:', error)
+        Toast('Terjadi kesalahan jaringan', 'error')
+      }
     }
   }
   
@@ -174,9 +192,20 @@
                         {#if customer.address}
                           <p class="mt-1 text-sm text-gray-500 truncate">📍 {customer.address}</p>
                         {/if}
-                        <p class="mt-1 text-xs text-gray-400">
-                          Dibuat: {formatDate(customer.created_at)}
-                        </p>
+                        <div class="mt-1 flex items-center justify-between">
+                          <p class="text-xs text-gray-400">
+                            Dibuat: {formatDate(customer.created_at)}
+                          </p>
+                          {#if customer.vehicle_count > 0}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                              {customer.vehicle_count} kendaraan
+                            </span>
+                          {:else}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                              Belum ada kendaraan
+                            </span>
+                          {/if}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -196,7 +225,7 @@
                       Edit
                     </a>
                     <button
-                      on:click={() => deleteCustomer(customer.id, customer.name)}
+                      on:click={() => deleteCustomer(customer.id, customer.name, customer.vehicle_count)}
                       class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                     >
                       Hapus

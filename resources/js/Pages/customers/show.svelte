@@ -2,6 +2,7 @@
   import { inertia } from '@inertiajs/svelte'
   import { fly } from 'svelte/transition'
   import SSTHeader from '../../Components/SSTHeader.svelte'
+  import { Toast } from '../../Components/helper.js'
   
   export let customer = {}
   export let vehicles = []
@@ -16,20 +17,40 @@
     })
   }
   
-  function deleteCustomer() {
-    if (confirm(`Apakah Anda yakin ingin menghapus pelanggan "${customer.name}"?`)) {
-      const form = document.createElement('form')
-      form.method = 'POST'
-      form.action = `/customers/${customer.id}`
-      
-      const methodInput = document.createElement('input')
-      methodInput.type = 'hidden'
-      methodInput.name = '_method'
-      methodInput.value = 'DELETE'
-      form.appendChild(methodInput)
-      
-      document.body.appendChild(form)
-      form.submit()
+  async function deleteCustomer() {
+    let confirmMessage = `Apakah Anda yakin ingin menghapus pelanggan "${customer.name}"?`;
+
+    if (vehicles && vehicles.length > 0) {
+      confirmMessage = `Apakah Anda yakin ingin menghapus pelanggan "${customer.name}" beserta ${vehicles.length} kendaraan yang terkait?\n\nPeringatan: Semua data kendaraan, service record, SPK, dan invoice yang terkait akan ikut terhapus secara permanen.`;
+    }
+
+    if (confirm(confirmMessage)) {
+      try {
+        const response = await fetch(`/customers/${customer.id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        })
+
+        const data = await response.json()
+
+        if (response.ok) {
+          // Show success toast
+          Toast(data.message || 'Pelanggan berhasil dihapus', 'success')
+
+          // Redirect to customers list after successful deletion
+          setTimeout(() => {
+            window.location.href = '/customers'
+          }, 1500)
+        } else {
+          // Show error toast
+          Toast(data.error || 'Terjadi kesalahan saat menghapus pelanggan', 'error')
+        }
+      } catch (error) {
+        console.error('Error deleting customer:', error)
+        Toast('Terjadi kesalahan jaringan', 'error')
+      }
     }
   }
 </script>
@@ -83,11 +104,15 @@
           <button
             on:click={deleteCustomer}
             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            title={vehicles && vehicles.length > 0 ? `Hapus pelanggan beserta ${vehicles.length} kendaraan yang terkait` : 'Hapus pelanggan'}
           >
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
             Hapus
+            {#if vehicles && vehicles.length > 0}
+              <span class="ml-1 text-xs opacity-75">({vehicles.length})</span>
+            {/if}
           </button>
         </div>
       </div>
@@ -146,6 +171,21 @@
                   </div>
                 {/if}
                 
+                <div>
+                  <dt class="text-sm font-medium text-gray-500">Jumlah Kendaraan</dt>
+                  <dd class="mt-1 text-sm text-gray-900">
+                    {#if vehicles && vehicles.length > 0}
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {vehicles.length} kendaraan terdaftar
+                      </span>
+                    {:else}
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        Belum ada kendaraan
+                      </span>
+                    {/if}
+                  </dd>
+                </div>
+
                 <div>
                   <dt class="text-sm font-medium text-gray-500">Terdaftar</dt>
                   <dd class="mt-1 text-sm text-gray-900">{formatDate(customer.created_at)}</dd>

@@ -24,11 +24,20 @@ class CustomerController {
         const totalResult = await countQuery.count('* as total').first();
         const totalItems = Number((totalResult as any)?.total || 0);
 
-        // Get paginated results
+        // Get paginated results with vehicle count
         const customers = await query
             .orderBy('created_at', 'desc')
             .offset((page - 1) * limit)
             .limit(limit);
+
+        // Add vehicle count to each customer
+        for (const customer of customers) {
+            const vehicleCountResult = await DB.from("vehicles")
+                .where("customer_id", customer.id)
+                .count('* as total')
+                .first();
+            customer.vehicle_count = Number((vehicleCountResult as any).total || 0);
+        }
 
         const totalPages = Math.ceil(totalItems / limit);
 
@@ -182,34 +191,54 @@ class CustomerController {
     public async destroy(request: Request, response: Response) {
         try {
             const { id } = request.params;
-            
+
             const customer = await DB.from("customers")
                 .where("id", id)
                 .first();
-            
+
             if (!customer) {
                 return response.status(404).json({
                     error: "Pelanggan tidak ditemukan"
                 });
             }
-            
-            // Check if customer has vehicles
+
+            // Get vehicle count for response message
             const vehicleCountResult = await DB.from("vehicles")
                 .where("customer_id", id)
                 .count('* as total')
                 .first();
 
-            if (vehicleCountResult && Number((vehicleCountResult as any).total || 0) > 0) {
-                return response.status(422).json({
-                    error: "Tidak dapat menghapus pelanggan yang masih memiliki kendaraan"
-                });
+            const vehicleCount = Number((vehicleCountResult as any).total || 0);
+
+            // Use database transaction for cascade delete
+            await DB.transaction(async (trx) => {
+                // Enable foreign key constraints (important for SQLite)
+                await trx.raw('PRAGMA foreign_keys = ON');
+
+                // Delete customer - foreign key constraints will handle cascade
+                const deletedRows = await trx.table("customers")
+                    .where("id", id)
+                    .delete();
+
+                if (deletedRows === 0) {
+                    throw new Error("Customer not found or already deleted");
+                }
+            });
+
+            // Prepare success message based on vehicle count
+            let message = "Pelanggan berhasil dihapus";
+            if (vehicleCount > 0) {
+                message = `Pelanggan berhasil dihapus beserta ${vehicleCount} kendaraan yang terkait`;
             }
-            
-            await DB.table("customers")
-                .where("id", id)
-                .delete();
-            
-            return response.redirect("/customers?success=Pelanggan berhasil dihapus");
+
+            return response.status(200).json({
+                success: true,
+                message: message,
+                data: {
+                    id,
+                    deletedVehicles: vehicleCount
+                }
+            });
         } catch (error) {
             console.error('Error deleting customer:', error);
             return response.status(500).json({
