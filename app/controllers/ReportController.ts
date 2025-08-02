@@ -2,6 +2,12 @@ import { Response, Request } from "../../type";
 import DB from "../services/DB";
 
 class Controller {
+    constructor() {
+        this.index = this.index.bind(this);
+        this.revenue = this.revenue.bind(this);
+        this.services = this.services.bind(this);
+        this.customers = this.customers.bind(this);
+    }
 
     public async index(request: Request, response: Response) {
         try {
