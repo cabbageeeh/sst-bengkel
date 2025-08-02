@@ -319,7 +319,7 @@
                 </div>
                 <div>
                   <dt class="text-sm font-medium text-gray-500">Tanggal Selesai</dt>
-                  <dd class="mt-1 text-sm text-gray-900">{formatDate(selectedSPK.completion_date)}</dd>
+                  <dd class="mt-1 text-sm text-gray-900">{formatDate(selectedSPK.tanggal_keluar)}</dd>
                 </div>
               </dl>
               

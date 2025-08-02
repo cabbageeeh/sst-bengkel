@@ -155,7 +155,9 @@ class SPKController {
                 spk_number: spkNumber,
                 service_description: service_description.trim(),
                 estimated_cost: estimated_cost ? parseFloat(estimated_cost) : 0,
-                status: 'draft',
+                status: 'in_progress',
+                tanggal_masuk: now,
+                tanggal_keluar: null,
                 notes: notes?.trim() || null,
                 created_at: now,
                 updated_at: now
@@ -274,7 +276,18 @@ class SPKController {
                 notes
             } = await request.json();
 
-            const updateData = {
+            // Get current SPK to check status change
+            const currentSPK = await DB.from("spk")
+                .where("id", id)
+                .first();
+
+            if (!currentSPK) {
+                return response.status(404).json({
+                    error: "SPK tidak ditemukan"
+                });
+            }
+
+            const updateData: any = {
                 vehicle_id,
                 service_description: service_description?.trim(),
                 estimated_cost: estimated_cost ? parseFloat(estimated_cost) : null,
@@ -283,6 +296,11 @@ class SPKController {
                 notes: notes?.trim() || null,
                 updated_at: Date.now()
             };
+
+            // Auto-fill tanggal_keluar when status changes to completed
+            if (status === 'completed' && currentSPK.status !== 'completed' && !currentSPK.tanggal_keluar) {
+                updateData.tanggal_keluar = Date.now();
+            }
 
             const updated = await DB.from("spk")
                 .where("id", id)

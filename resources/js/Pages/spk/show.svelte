@@ -157,12 +157,12 @@
                 <dd class="mt-1 text-sm text-gray-900">{formatDate(spk.created_at)}</dd>
               </div>
               <div>
-                <dt class="text-sm font-medium text-gray-500">Tanggal Mulai</dt>
-                <dd class="mt-1 text-sm text-gray-900">{formatDate(spk.start_date)}</dd>
+                <dt class="text-sm font-medium text-gray-500">Tanggal Masuk</dt>
+                <dd class="mt-1 text-sm text-gray-900">{formatDate(spk.tanggal_masuk)}</dd>
               </div>
               <div>
-                <dt class="text-sm font-medium text-gray-500">Tanggal Selesai</dt>
-                <dd class="mt-1 text-sm text-gray-900">{formatDate(spk.completion_date)}</dd>
+                <dt class="text-sm font-medium text-gray-500">Tanggal Keluar</dt>
+                <dd class="mt-1 text-sm text-gray-900">{formatDate(spk.tanggal_keluar)}</dd>
               </div>
               <div>
                 <dt class="text-sm font-medium text-gray-500">Estimasi Biaya</dt>

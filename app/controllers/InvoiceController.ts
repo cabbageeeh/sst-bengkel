@@ -77,7 +77,7 @@ class InvoiceController {
                 .leftJoin("invoices", "spk.id", "invoices.spk_id")
                 .where("spk.status", "completed")
                 .whereNull("invoices.id")
-                .orderBy("spk.completion_date", "desc");
+                .orderBy("spk.tanggal_keluar", "desc");
 
             return response.inertia("invoices/create", {
                 availableSPKs

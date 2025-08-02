@@ -95,16 +95,16 @@ class Controller {
                 .leftJoin("customers", "vehicles.customer_id", "customers.id");
 
             if (startDate) {
-                query = query.where("spk.start_date", ">=", new Date(startDate).getTime());
+                query = query.where("spk.tanggal_masuk", ">=", new Date(startDate).getTime());
             }
             if (endDate) {
-                query = query.where("spk.start_date", "<=", new Date(endDate).getTime());
+                query = query.where("spk.tanggal_masuk", "<=", new Date(endDate).getTime());
             }
             if (status) {
                 query = query.where("spk.status", status);
             }
 
-            const services = await query.orderBy("spk.start_date", "desc");
+            const services = await query.orderBy("spk.tanggal_masuk", "desc");
 
             // Get service statistics
             const serviceStats = await DB.from("spk")
@@ -143,7 +143,7 @@ class Controller {
                     DB.raw("COUNT(DISTINCT vehicles.id) as vehicle_count"),
                     DB.raw("COUNT(DISTINCT spk.id) as service_count"),
                     DB.raw("COALESCE(SUM(invoices.total_amount), 0) as total_spent"),
-                    DB.raw("MAX(spk.start_date) as last_service_date")
+                    DB.raw("MAX(spk.tanggal_masuk) as last_service_date")
                 )
                 .leftJoin("vehicles", "customers.id", "vehicles.customer_id")
                 .leftJoin("spk", "vehicles.id", "spk.vehicle_id")
@@ -203,7 +203,7 @@ class Controller {
         // Completed services for period
         const completedServices = await DB.from("spk")
             .where("status", "completed")
-            .whereBetween("completion_date", [startDate, endDate])
+            .whereBetween("tanggal_keluar", [startDate, endDate])
             .count("* as count")
             .first();
 
