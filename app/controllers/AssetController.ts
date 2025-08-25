@@ -4,6 +4,7 @@ import fs from "fs";
 // Cache object to store file contents in memory
 let cache: { [key: string]: Buffer } = {};
 
+
 class Controller {
     /**
      * Serves assets from the dist folder (compiled assets)
