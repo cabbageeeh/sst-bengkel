@@ -3,21 +3,21 @@ const path = require('path');
 const { PDFDocument, PDFForm, PDFTextField, rgb } = require('pdf-lib');
 const dayjs = require('dayjs');
 
-// Sample SPK data untuk testing
+// Sample SPK data untuk testing dengan text yang panjang
 const sampleSpkData = {
     spk_number: 'SPK-202412-0001',
     tanggal_masuk: Date.now(),
     tanggal_keluar: Date.now() + (24 * 60 * 60 * 1000), // +1 day
-    customer_name: 'John Doe',
-    customer_address: 'Jl. Contoh No. 123, Jakarta Selatan',
+    customer_name: 'John Doe Dengan Nama Yang Sangat Panjang Sekali',
+    customer_address: 'Jl. Contoh Alamat Yang Sangat Panjang Sekali No. 123, RT 05/RW 07, Kelurahan Contoh, Kecamatan Sample, Jakarta Selatan 12345',
     customer_phone: '081234567890',
     license_plate: 'B 1234 ABC',
     brand: 'Toyota',
     model: 'Avanza',
     year: 2020,
     kilometer: 45000,
-    keluhan: 'Mesin bersuara kasar dan oli bocor',
-    service_description: 'Ganti oli mesin, tune up, dan perbaikan kebocoran oli',
+    keluhan: 'Mesin bersuara kasar dan oli bocor, ada bunyi tidak normal dari bagian depan, kemungkinan masalah pada bearing atau komponen transmisi, perlu pemeriksaan menyeluruh untuk mengetahui sumber masalah yang sebenarnya',
+    service_description: 'Ganti oli mesin menggunakan oli sintetik SAE 5W-30, tune up lengkap termasuk ganti busi, filter udara, dan filter oli, perbaikan kebocoran oli pada bagian gasket kepala silinder, pembersihan throttle body, pemeriksaan sistem pendingin dan radiator, serta general check up untuk semua komponen kendaraan',
     estimated_cost: 750000,
     actual_cost: 720000,
     status: 'completed'
@@ -268,6 +268,9 @@ async function main() {
         console.log('3. PDF coordinate system: (0,0) is bottom-left corner');
         console.log('4. Increase Y value to move text up, decrease to move down');
         console.log('5. Increase X value to move text right, decrease to move left');
+        console.log('6. Adjust maxWidth values to control text wrapping areas');
+        console.log('7. Text wrapping automatically handles long content');
+        console.log('8. Check console output for wrapping information');
         
     } catch (error) {
         console.error('❌ Test failed:', error);

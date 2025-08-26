@@ -9,38 +9,38 @@ const { PDFDocument, rgb } = require('pdf-lib');
 
 // SESUAIKAN KOORDINAT INI BERDASARKAN TEMPLATE PDF ANDA
 const FIELD_POSITIONS = {
-    // Format: { label: 'Label', x: koordinat_x, y: koordinat_y }
+    // Format: { label: 'Label', x: koordinat_x, y: koordinat_y, maxWidth: max_width_for_wrapping }
     
     // Header Section
-    spk_number: { label: 'No SPK', x: 150, y: 722 },
-    tanggal_masuk: { label: 'Tanggal Masuk', x: 400, y: 722 },
+    spk_number: { label: 'No SPK', x: 450, y: 760, maxWidth: 150 },
+    tanggal_masuk: { label: 'Tanggal Masuk', x: 450, y: 740, maxWidth: 150 },
     
-    // Customer Information
-    customer_name: { label: 'Nama', x: 150, y: 682 },
-    customer_address: { label: 'Alamat', x: 150, y: 662 },
-    customer_phone: { label: 'No Telp', x: 150, y: 642 },
+    // Customer Information (left column)
+    customer_name: { label: 'Nama', x: 100, y: 657, maxWidth: 200 },
+    customer_address: { label: 'Alamat', x: 100, y: 620, maxWidth: 200 },
+    customer_phone: { label: 'No Telp', x: 100, y: 549, maxWidth: 200 },
     
-    // Vehicle Information  
-    license_plate: { label: 'No Polisi', x: 150, y: 602 },
-    vehicle_type: { label: 'Type/Model', x: 150, y: 582 },
-    vehicle_year: { label: 'Tahun', x: 150, y: 562 },
-    kilometer: { label: 'Kilometer', x: 150, y: 542 },
+    // Vehicle Information (right column)
+    license_plate: { label: 'No Polisi', x: 345, y: 657, maxWidth: 150 },
+    vehicle_type: { label: 'Type/Model', x: 345, y: 622, maxWidth: 150 },
+    vehicle_year: { label: 'Tahun', x: 345, y: 580, maxWidth: 150 },
+    kilometer: { label: 'Kilometer', x: 345, y: 549, maxWidth: 150 },
     
-    // Service Information
-    keluhan: { label: 'Keluhan', x: 150, y: 502 },
-    service_description: { label: 'Jenis Service', x: 150, y: 462 },
-    
-    // DateTime Information
-    jam_masuk: { label: 'Jam Masuk', x: 150, y: 422 },
-    jam_keluar: { label: 'Jam Keluar', x: 400, y: 422 },
+    // Service Information (full width for long text)
+    service_description: { label: 'Jenis Service', x: 40, y: 480, maxWidth: 415 },
+    keluhan: { label: 'Keluhan', x: 260, y: 480, maxWidth: 195 },
     
     // Cost Information
-    estimated_cost: { label: 'Estimasi Biaya', x: 150, y: 382 },
-    actual_cost: { label: 'Biaya Aktual', x: 400, y: 382 },
+    estimated_cost: { label: 'Estimasi Biaya', x: 100, y: 105, maxWidth: 200 },
+    actual_cost: { label: 'Biaya Aktual', x: 300, y: 105, maxWidth: 150 },
     
-    // Signature Areas (jika diperlukan)
-    signature_customer: { label: 'TTD Customer', x: 150, y: 150 },
-    signature_mechanic: { label: 'TTD Mekanik', x: 400, y: 150 }
+    // DateTime Information (if needed)
+    jam_masuk: { label: 'Jam Masuk', x: 150, y: 422, maxWidth: 150 },
+    jam_keluar: { label: 'Jam Keluar', x: 400, y: 422, maxWidth: 150 },
+    
+    // Signature Areas (if needed)
+    signature_customer: { label: 'TTD Customer', x: 150, y: 150, maxWidth: 150 },
+    signature_mechanic: { label: 'TTD Mekanik', x: 400, y: 150, maxWidth: 150 }
 };
 
 /**
@@ -130,38 +130,79 @@ async function generateWithCustomPositions() {
         const firstPage = pages[0];
         const font = await pdfDoc.embedFont('Helvetica');
         
-        // Sample data
         const sampleData = {
             spk_number: 'SPK-202412-0001',
             tanggal_masuk: '27/08/2025',
-            customer_name: 'John Doe',
-            customer_address: 'Jl. Contoh No. 123, Jakarta Selatan',
+            customer_name: 'John Doe Dengan Nama Yang Sangat Panjang Sekali',
+            customer_address: 'Jl. Contoh Alamat Yang Sangat Panjang Sekali No. 123, RT 05/RW 07, Kelurahan Contoh, Kecamatan Sample, Jakarta Selatan 12345',
             customer_phone: '081234567890',
             license_plate: 'B 1234 ABC',
             vehicle_type: 'Toyota Avanza',
             vehicle_year: '2020',
             kilometer: '45000',
-            keluhan: 'Mesin bersuara kasar dan oli bocor',
-            service_description: 'Ganti oli mesin, tune up, dan perbaikan kebocoran oli',
+            keluhan: 'Mesin bersuara kasar dan oli bocor, ada bunyi tidak normal dari bagian depan, kemungkinan masalah pada bearing atau komponen transmisi, perlu pemeriksaan menyeluruh untuk mengetahui sumber masalah yang sebenarnya',
+            service_description: 'Ganti oli mesin menggunakan oli sintetik SAE 5W-30, tune up lengkap termasuk ganti busi, filter udara, dan filter oli, perbaikan kebocoran oli pada bagian gasket kepala silinder, pembersihan throttle body, pemeriksaan sistem pendingin dan radiator, serta general check up untuk semua komponen kendaraan',
             jam_masuk: '27/08/2025 08:00',
             jam_keluar: '28/08/2025 17:00',
             estimated_cost: 'Rp 750.000',
             actual_cost: 'Rp 720.000'
         };
         
-        // Add text at specified positions
+        // Add text at specified positions with wrapping support
         Object.entries(FIELD_POSITIONS).forEach(([field, position]) => {
             const value = sampleData[field];
             if (value) {
-                firstPage.drawText(value, {
-                    x: position.x,
-                    y: position.y,
-                    size: 10,
-                    font,
-                    color: rgb(0, 0, 0),
-                });
+                // Simple text wrapping for demo (split long text)
+                const maxWidth = position.maxWidth || 200;
+                const text = value.toString();
                 
-                console.log(`  ✅ ${position.label}: "${value}" at (${position.x}, ${position.y})`);
+                if (text.length * 6 > maxWidth) { // Rough character width estimation
+                    // Split into multiple lines if too long
+                    const words = text.split(' ');
+                    let currentLine = '';
+                    let currentY = position.y;
+                    
+                    for (const word of words) {
+                        const testLine = currentLine ? `${currentLine} ${word}` : word;
+                        if (testLine.length * 6 <= maxWidth) {
+                            currentLine = testLine;
+                        } else {
+                            if (currentLine) {
+                                firstPage.drawText(currentLine, {
+                                    x: position.x,
+                                    y: currentY,
+                                    size: 10,
+                                    font,
+                                    color: rgb(0, 0, 0),
+                                });
+                                currentY -= 12; // Move to next line
+                                currentLine = word;
+                            }
+                        }
+                    }
+                    
+                    if (currentLine) {
+                        firstPage.drawText(currentLine, {
+                            x: position.x,
+                            y: currentY,
+                            size: 10,
+                            font,
+                            color: rgb(0, 0, 0),
+                        });
+                    }
+                    
+                    console.log(`  ✅ ${position.label}: "${value}" (WRAPPED) at (${position.x}, ${position.y})`);
+                } else {
+                    firstPage.drawText(text, {
+                        x: position.x,
+                        y: position.y,
+                        size: 10,
+                        font,
+                        color: rgb(0, 0, 0),
+                    });
+                    
+                    console.log(`  ✅ ${position.label}: "${value}" at (${position.x}, ${position.y})`);
+                }
             }
         });
         
