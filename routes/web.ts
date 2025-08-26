@@ -88,6 +88,7 @@ Route.post("/spk", SPKController.store);
 Route.get("/spk/:id", SPKController.show);
 Route.get("/spk/:id/edit", SPKController.edit);
 Route.put("/spk/:id", SPKController.update);
+Route.patch("/spk/:id/complete", SPKController.complete);
 Route.delete("/spk/:id", SPKController.destroy);
 
 /**

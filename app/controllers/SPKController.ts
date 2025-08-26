@@ -322,6 +322,65 @@ class SPKController {
         }
     }
 
+    public async complete(request: Request, response: Response) {
+        try {
+            const { id } = request.params;
+            const { actual_cost } = await request.json();
+
+            // Get current SPK
+            const currentSPK = await DB.from("spk")
+                .where("id", id)
+                .first();
+
+            if (!currentSPK) {
+                return response.status(404).json({
+                    error: "SPK tidak ditemukan"
+                });
+            }
+
+            // Check if SPK is already completed
+            if (currentSPK.status === 'completed') {
+                return response.status(422).json({
+                    error: "SPK sudah dalam status selesai"
+                });
+            }
+
+            // Validate actual_cost
+            if (!actual_cost || isNaN(parseFloat(actual_cost))) {
+                return response.status(422).json({
+                    error: "Biaya aktual harus diisi dengan angka yang valid"
+                });
+            }
+
+            const updateData: any = {
+                actual_cost: parseFloat(actual_cost),
+                status: 'completed',
+                tanggal_keluar: Date.now(),
+                updated_at: Date.now()
+            };
+
+            const updated = await DB.from("spk")
+                .where("id", id)
+                .update(updateData);
+
+            if (!updated) {
+                return response.status(404).json({
+                    error: "SPK tidak ditemukan"
+                });
+            }
+
+            return response.status(200).json({
+                success: true,
+                message: "SPK berhasil diselesaikan"
+            });
+        } catch (error) {
+            console.error('Error completing SPK:', error);
+            return response.status(500).json({
+                error: "Terjadi kesalahan saat menyelesaikan SPK"
+            });
+        }
+    }
+
     public async destroy(request: Request, response: Response) {
         try {
             const { id } = request.params;

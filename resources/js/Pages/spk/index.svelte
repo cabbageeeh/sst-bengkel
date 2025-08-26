@@ -13,6 +13,13 @@
   let searchInput = search
   let statusFilter = status
   let showSuccess = !!success
+  
+  // Modal state for completing SPK
+  let showCompleteModal = false
+  let selectedSPK = null
+  let actualCost = ''
+  let actualCostDisplay = ''
+  let isSubmitting = false
 
   function handleSearch() {
     const params = {}
@@ -66,6 +73,27 @@
     return texts[status] || status
   }
   
+  function formatNumberInput(value) {
+    // Remove all non-digits
+    const numbersOnly = value.replace(/\D/g, '')
+    
+    // Format with thousand separators
+    if (numbersOnly === '') return ''
+    
+    return new Intl.NumberFormat('id-ID').format(parseInt(numbersOnly))
+  }
+  
+  function parseNumberInput(value) {
+    // Remove all non-digits and return as string
+    return value.replace(/\D/g, '')
+  }
+  
+  function handleActualCostInput(event) {
+    const value = event.target.value
+    actualCost = parseNumberInput(value)
+    actualCostDisplay = formatNumberInput(value)
+  }
+  
   async function deleteSPK(spk) {
     let confirmMessage = `Apakah Anda yakin ingin menghapus SPK "${spk.spk_number}"?`;
     
@@ -101,6 +129,72 @@
         console.error('Error deleting SPK:', error)
         Toast('Terjadi kesalahan jaringan', 'error')
       }
+    }
+  }
+  
+  function openCompleteModal(spk) {
+    selectedSPK = spk
+    if (spk.estimated_cost) {
+      actualCost = spk.estimated_cost.toString()
+      actualCostDisplay = formatNumberInput(actualCost)
+    } else {
+      actualCost = ''
+      actualCostDisplay = ''
+    }
+    showCompleteModal = true
+  }
+  
+  function closeCompleteModal() {
+    showCompleteModal = false
+    selectedSPK = null
+    actualCost = ''
+    actualCostDisplay = ''
+    isSubmitting = false
+  }
+  
+  async function completeSPK() {
+    if (!selectedSPK || !actualCost.trim()) {
+      Toast('Biaya aktual harus diisi', 'error')
+      return
+    }
+    
+    if (isNaN(parseFloat(actualCost))) {
+      Toast('Biaya aktual harus berupa angka yang valid', 'error')
+      return
+    }
+    
+    isSubmitting = true
+    
+    try {
+      const response = await fetch(`/spk/${selectedSPK.id}/complete`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          actual_cost: parseFloat(actualCost)
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        Toast(data.message || 'SPK berhasil diselesaikan', 'success')
+        closeCompleteModal()
+        
+        // Refresh the page to update the list
+        setTimeout(() => {
+          window.location.reload()
+        }, 1000)
+      } else {
+        Toast(data.error || 'Terjadi kesalahan saat menyelesaikan SPK', 'error')
+      }
+    } catch (error) {
+      console.error('Error completing SPK:', error)
+      Toast('Terjadi kesalahan jaringan', 'error')
+    } finally {
+      isSubmitting = false
     }
   }
   
@@ -267,6 +361,14 @@
                     >
                       Lihat
                     </a>
+                    {#if spk.status === 'in_progress'}
+                      <button
+                        on:click={() => openCompleteModal(spk)}
+                        class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                      >
+                        Selesai
+                      </button>
+                    {/if}
                     <a
                       href="/spk/{spk.id}/edit"
                       use:inertia
@@ -370,3 +472,67 @@
     {/if}
   </div>
 </div>
+
+<!-- Modal Selesai SPK -->
+{#if showCompleteModal}
+  <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" transition:fade>
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div class="mt-3">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+          <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <div class="mt-3 text-center">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">Selesaikan SPK</h3>
+          {#if selectedSPK}
+            <div class="mt-2">
+              <p class="text-sm text-gray-500">SPK: <span class="font-semibold">{selectedSPK.spk_number}</span></p>
+              <p class="text-sm text-gray-500">{selectedSPK.license_plate} - {selectedSPK.customer_name}</p>
+            </div>
+          {/if}
+          <div class="mt-4">
+            <label for="actualCost" class="block text-sm font-medium text-gray-700 text-left mb-2">
+              Biaya Aktual (Rp)
+            </label>
+            <input
+              type="text"
+              id="actualCost"
+              value={actualCostDisplay}
+              on:input={handleActualCostInput}
+              placeholder="Masukkan biaya aktual"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              disabled={isSubmitting}
+            />
+          </div>
+        </div>
+        <div class="items-center px-4 py-3">
+          <div class="flex justify-end space-x-3">
+            <button
+              on:click={closeCompleteModal}
+              class="px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
+              disabled={isSubmitting}
+            >
+              Batal
+            </button>
+            <button
+              on:click={completeSPK}
+              class="px-4 py-2 bg-green-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting || !actualCost.trim()}
+            >
+              {#if isSubmitting}
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Memproses...
+              {:else}
+                Selesaikan SPK
+              {/if}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{/if}
