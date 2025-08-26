@@ -108,6 +108,8 @@ class SPKController {
                 vehicle_id,
                 service_description,
                 estimated_cost,
+                kilometer,
+                keluhan,
                 notes
             } = await request.json();
 
@@ -155,6 +157,8 @@ class SPKController {
                 spk_number: spkNumber,
                 service_description: service_description.trim(),
                 estimated_cost: estimated_cost ? parseFloat(estimated_cost) : 0,
+                kilometer: kilometer ? parseInt(kilometer) : null,
+                keluhan: keluhan?.trim() || null,
                 status: 'in_progress',
                 tanggal_masuk: now,
                 tanggal_keluar: null,
@@ -185,8 +189,11 @@ class SPKController {
                     "vehicles.brand",
                     "vehicles.model",
                     "vehicles.year",
+                    "vehicles.engine_type",
+                    "vehicles.color",
                     "customers.name as customer_name",
-                    "customers.phone as customer_phone"
+                    "customers.phone as customer_phone",
+                    "customers.address as customer_address"
                 )
                 .leftJoin("vehicles", "spk.vehicle_id", "vehicles.id")
                 .leftJoin("customers", "vehicles.customer_id", "customers.id")
@@ -227,8 +234,11 @@ class SPKController {
                     "vehicles.brand",
                     "vehicles.model",
                     "vehicles.year",
+                    "vehicles.engine_type",
+                    "vehicles.color",
                     "customers.name as customer_name",
-                    "customers.phone as customer_phone"
+                    "customers.phone as customer_phone",
+                    "customers.address as customer_address"
                 )
                 .leftJoin("vehicles", "spk.vehicle_id", "vehicles.id")
                 .leftJoin("customers", "vehicles.customer_id", "customers.id")
@@ -270,6 +280,8 @@ class SPKController {
                 service_description,
                 estimated_cost,
                 actual_cost,
+                kilometer,
+                keluhan,
                 status,
                 notes
             } = await request.json();
@@ -290,6 +302,8 @@ class SPKController {
                 service_description: service_description?.trim(),
                 estimated_cost: estimated_cost ? parseFloat(estimated_cost) : null,
                 actual_cost: actual_cost ? parseFloat(actual_cost) : null,
+                kilometer: kilometer ? parseInt(kilometer) : null,
+                keluhan: keluhan?.trim() || null,
                 status,
                 notes: notes?.trim() || null,
                 updated_at: Date.now()
