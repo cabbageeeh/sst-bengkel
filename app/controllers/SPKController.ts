@@ -1,5 +1,6 @@
 import { Response, Request } from "../../type";
 import DB from "../services/DB";
+import PdfService from "../services/PdfService";
 import { v4 as uuidv4 } from 'uuid';
 
 class SPKController {
@@ -391,6 +392,51 @@ class SPKController {
             console.error('Error completing SPK:', error);
             return response.status(500).json({
                 error: "Terjadi kesalahan saat menyelesaikan SPK"
+            });
+        }
+    }
+
+    public async generatePdf(request: Request, response: Response) {
+        try {
+            const { id } = request.params;
+            
+            const spk = await DB.from("spk")
+                .select(
+                    "spk.*",
+                    "vehicles.license_plate",
+                    "vehicles.brand",
+                    "vehicles.model",
+                    "vehicles.year",
+                    "vehicles.engine_type",
+                    "vehicles.color",
+                    "customers.name as customer_name",
+                    "customers.phone as customer_phone",
+                    "customers.address as customer_address"
+                )
+                .leftJoin("vehicles", "spk.vehicle_id", "vehicles.id")
+                .leftJoin("customers", "vehicles.customer_id", "customers.id")
+                .where("spk.id", id)
+                .first();
+            
+            if (!spk) {
+                return response.status(404).json({
+                    error: "SPK tidak ditemukan"
+                });
+            }
+
+            // Generate PDF menggunakan template yang sudah ada
+            const pdfBuffer = await PdfService.generateSpkPdf(spk);
+            
+            // Set response headers untuk download PDF
+            response.setHeader('Content-Type', 'application/pdf');
+            response.setHeader('Content-Disposition', `attachment; filename="SPK-${spk.spk_number}.pdf"`);
+            response.setHeader('Content-Length', pdfBuffer.length.toString());
+            
+            return response.end(pdfBuffer);
+        } catch (error) {
+            console.error('Error generating SPK PDF:', error);
+            return response.status(500).json({
+                error: "Terjadi kesalahan saat membuat PDF SPK"
             });
         }
     }
