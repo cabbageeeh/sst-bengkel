@@ -173,9 +173,6 @@
                     {#if invoice.customer_phone}
                       <div>Telp: {invoice.customer_phone}</div>
                     {/if}
-                    {#if invoice.customer_email}
-                      <div>Email: {invoice.customer_email}</div>
-                    {/if}
                     {#if invoice.customer_address}
                       <div class="mt-1">{invoice.customer_address}</div>
                     {/if}

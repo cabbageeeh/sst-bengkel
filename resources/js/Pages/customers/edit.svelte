@@ -8,7 +8,6 @@
   let form = {
     name: customer.name || '',
     phone: customer.phone || '',
-    email: customer.email || '',
     address: customer.address || ''
   }
 
@@ -49,18 +48,14 @@
       newErrors.name = 'Nama pelanggan wajib diisi'
     }
     
-    if (form.email && !isValidEmail(form.email)) {
-      newErrors.email = 'Format email tidak valid'
+    if (!form.phone.trim()) {
+      newErrors.phone = 'Nomor telepon wajib diisi'
     }
     
     errors = newErrors
     return Object.keys(newErrors).length === 0
   }
-  
-  function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
+
   
   function handleInputChange() {
     // Clear errors when user starts typing
@@ -165,7 +160,7 @@
             <!-- Phone Field -->
             <div>
               <label for="phone" class="block text-sm font-medium text-gray-700">
-                Nomor Telepon
+                Nomor Telepon <span class="text-red-500">*</span>
               </label>
               <div class="mt-1">
                 <input
@@ -173,32 +168,17 @@
                   type="tel"
                   bind:value={form.phone}
                   on:input={handleInputChange}
-                  class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  required
+                  class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md {errors.phone ? 'border-red-300' : ''}"
                   placeholder="Contoh: 08123456789"
                 />
               </div>
+              {#if errors.phone}
+                <p class="mt-2 text-sm text-red-600">{errors.phone}</p>
+              {/if}
               <p class="mt-2 text-sm text-gray-500">Nomor telepon yang dapat dihubungi</p>
             </div>
 
-            <!-- Email Field -->
-            <div>
-              <label for="email" class="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <div class="mt-1">
-                <input
-                  id="email"
-                  type="email"
-                  bind:value={form.email}
-                  on:input={handleInputChange}
-                  class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md {errors.email ? 'border-red-300' : ''}"
-                  placeholder="contoh@email.com"
-                />
-              </div>
-              {#if errors.email}
-                <p class="mt-2 text-sm text-red-600">{errors.email}</p>
-              {/if}
-            </div>
 
             <!-- Address Field -->
             <div>

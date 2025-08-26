@@ -14,8 +14,7 @@ class CustomerController {
         if (search) {
             query = query.where(function() {
                 this.where('name', 'like', `%${search}%`)
-                    .orWhere('phone', 'like', `%${search}%`)
-                    .orWhere('email', 'like', `%${search}%`);
+                    .orWhere('phone', 'like', `%${search}%`);
             });
         }
         
@@ -60,12 +59,29 @@ class CustomerController {
 
     public async store(request: Request, response: Response) {
         try {
-            const { name, phone, email, address } = await request.json();
+            const { name, phone, address } = await request.json();
             
             // Validation
             if (!name || name.trim() === '') {
                 return response.status(422).json({
                     error: "Nama pelanggan wajib diisi"
+                });
+            }
+            
+            if (!phone || phone.trim() === '') {
+                return response.status(422).json({
+                    error: "Nomor telepon wajib diisi"
+                });
+            }
+            
+            // Check if phone number already exists
+            const existingCustomer = await DB.from("customers")
+                .where("phone", phone.trim())
+                .first();
+            
+            if (existingCustomer) {
+                return response.status(422).json({
+                    error: "Nomor telepon sudah digunakan oleh pelanggan lain"
                 });
             }
             
@@ -75,8 +91,7 @@ class CustomerController {
             await DB.table("customers").insert({
                 id: customerId,
                 name: name.trim(),
-                phone: phone?.trim() || null,
-                email: email?.trim() || null,
+                phone: phone.trim(),
                 address: address?.trim() || null,
                 created_at: now,
                 updated_at: now
@@ -150,12 +165,18 @@ class CustomerController {
     public async update(request: Request, response: Response) {
         try {
             const { id } = request.params;
-            const { name, phone, email, address } = await request.json();
+            const { name, phone, address } = await request.json();
             
             // Validation
             if (!name || name.trim() === '') {
                 return response.status(422).json({
                     error: "Nama pelanggan wajib diisi"
+                });
+            }
+            
+            if (!phone || phone.trim() === '') {
+                return response.status(422).json({
+                    error: "Nomor telepon wajib diisi"
                 });
             }
             
@@ -169,12 +190,23 @@ class CustomerController {
                 });
             }
             
+            // Check if phone number already exists (excluding current customer)
+            const existingCustomer = await DB.from("customers")
+                .where("phone", phone.trim())
+                .whereNot("id", id)
+                .first();
+            
+            if (existingCustomer) {
+                return response.status(422).json({
+                    error: "Nomor telepon sudah digunakan oleh pelanggan lain"
+                });
+            }
+            
             await DB.table("customers")
                 .where("id", id)
                 .update({
                     name: name.trim(),
-                    phone: phone?.trim() || null,
-                    email: email?.trim() || null,
+                    phone: phone.trim(),
                     address: address?.trim() || null,
                     updated_at: Date.now()
                 });

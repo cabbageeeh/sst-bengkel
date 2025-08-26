@@ -285,12 +285,6 @@
                   <dd class="mt-1 text-sm text-gray-900">{spk.customer_phone}</dd>
                 </div>
               {/if}
-              {#if spk.customer_email}
-                <div>
-                  <dt class="text-sm font-medium text-gray-500">Email</dt>
-                  <dd class="mt-1 text-sm text-gray-900">{spk.customer_email}</dd>
-                </div>
-              {/if}
             </dl>
           </div>
         </div>

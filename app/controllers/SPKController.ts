@@ -186,8 +186,7 @@ class SPKController {
                     "vehicles.model",
                     "vehicles.year",
                     "customers.name as customer_name",
-                    "customers.phone as customer_phone",
-                    "customers.email as customer_email"
+                    "customers.phone as customer_phone"
                 )
                 .leftJoin("vehicles", "spk.vehicle_id", "vehicles.id")
                 .leftJoin("customers", "vehicles.customer_id", "customers.id")
@@ -229,8 +228,7 @@ class SPKController {
                     "vehicles.model",
                     "vehicles.year",
                     "customers.name as customer_name",
-                    "customers.phone as customer_phone",
-                    "customers.email as customer_email"
+                    "customers.phone as customer_phone"
                 )
                 .leftJoin("vehicles", "spk.vehicle_id", "vehicles.id")
                 .leftJoin("customers", "vehicles.customer_id", "customers.id")

@@ -183,7 +183,6 @@ class InvoiceController {
                     "vehicles.model",
                     "customers.name as customer_name",
                     "customers.phone as customer_phone",
-                    "customers.email as customer_email",
                     "customers.address as customer_address"
                 )
                 .leftJoin("spk", "invoices.spk_id", "spk.id")

@@ -153,17 +153,6 @@
                   </div>
                 {/if}
                 
-                {#if customer.email}
-                  <div>
-                    <dt class="text-sm font-medium text-gray-500">Email</dt>
-                    <dd class="mt-1 text-sm text-gray-900">
-                      <a href="mailto:{customer.email}" class="text-blue-600 hover:text-blue-500">
-                        {customer.email}
-                      </a>
-                    </dd>
-                  </div>
-                {/if}
-                
                 {#if customer.address}
                   <div>
                     <dt class="text-sm font-medium text-gray-500">Alamat</dt>

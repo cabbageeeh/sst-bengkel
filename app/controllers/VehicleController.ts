@@ -163,7 +163,6 @@ class VehicleController {
                     "vehicles.*",
                     "customers.name as customer_name",
                     "customers.phone as customer_phone",
-                    "customers.email as customer_email",
                     "customers.address as customer_address"
                 )
                 .leftJoin("customers", "vehicles.customer_id", "customers.id")
