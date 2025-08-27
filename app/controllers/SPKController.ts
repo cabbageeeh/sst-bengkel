@@ -3,6 +3,21 @@ import DB from "../services/DB";
 import PdfService from "../services/PdfService";
 import { v4 as uuidv4 } from 'uuid';
 
+/**
+ * Convert time string (HH:MM) to timestamp of today
+ */
+function timeStringToTimestamp(timeString: string): number | null {
+    if (!timeString) return null;
+    
+    const today = new Date();
+    const [hours, minutes] = timeString.split(':').map(Number);
+    
+    if (isNaN(hours) || isNaN(minutes)) return null;
+    
+    today.setHours(hours, minutes, 0, 0);
+    return today.getTime();
+}
+
 class SPKController {
 
     public async index(request: Request, response: Response) {
@@ -111,6 +126,9 @@ class SPKController {
                 estimated_cost,
                 kilometer,
                 keluhan,
+                jam_masuk,
+                jam_janji_selesai,
+                jarak,
                 notes
             } = await request.json();
 
@@ -160,6 +178,9 @@ class SPKController {
                 estimated_cost: estimated_cost ? parseFloat(estimated_cost) : 0,
                 kilometer: kilometer ? parseInt(kilometer) : null,
                 keluhan: keluhan?.trim() || null,
+                jam_masuk: timeStringToTimestamp(jam_masuk) || now,
+                jam_janji_selesai: timeStringToTimestamp(jam_janji_selesai),
+                jarak: jarak ? parseInt(jarak) : (kilometer ? parseInt(kilometer) : null),
                 status: 'in_progress',
                 tanggal_masuk: now,
                 tanggal_keluar: null,
@@ -283,6 +304,9 @@ class SPKController {
                 actual_cost,
                 kilometer,
                 keluhan,
+                jam_masuk,
+                jam_janji_selesai,
+                jarak,
                 status,
                 notes
             } = await request.json();
@@ -305,6 +329,9 @@ class SPKController {
                 actual_cost: actual_cost ? parseFloat(actual_cost) : null,
                 kilometer: kilometer ? parseInt(kilometer) : null,
                 keluhan: keluhan?.trim() || null,
+                jam_masuk: jam_masuk ? timeStringToTimestamp(jam_masuk) : null,
+                jam_janji_selesai: jam_janji_selesai ? timeStringToTimestamp(jam_janji_selesai) : null,
+                jarak: jarak ? parseInt(jarak) : (kilometer ? parseInt(kilometer) : null),
                 status,
                 notes: notes?.trim() || null,
                 updated_at: Date.now()

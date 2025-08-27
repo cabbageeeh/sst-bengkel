@@ -12,6 +12,11 @@
     service_description: spk.service_description || '',
     estimated_cost: spk.estimated_cost || '',
     actual_cost: spk.actual_cost || '',
+    kilometer: spk.kilometer || '',
+    keluhan: spk.keluhan || '',
+    jam_masuk: spk.jam_masuk || '',
+    jam_janji_selesai: spk.jam_janji_selesai || '',
+    jarak: spk.jarak || spk.kilometer || '',
     status: spk.status || 'draft',
     notes: spk.notes || ''
   }
@@ -85,6 +90,14 @@
       newErrors.actual_cost = 'Biaya aktual harus berupa angka'
     }
     
+    if (form.kilometer && isNaN(parseInt(form.kilometer))) {
+      newErrors.kilometer = 'Kilometer harus berupa angka'
+    }
+    
+    if (form.jarak && isNaN(parseInt(form.jarak))) {
+      newErrors.jarak = 'Jarak harus berupa angka'
+    }
+    
     errors = newErrors
     return Object.keys(newErrors).length === 0
   }
@@ -107,6 +120,26 @@
     event.target.value = formatCurrency(value)
   }
 
+  function handleKilometerInput(event) {
+    const value = event.target.value.replace(/[^\d]/g, '')
+    form.kilometer = value
+    // Auto-fill jarak dengan nilai yang sama dengan kilometer
+    form.jarak = value
+    event.target.value = formatCurrency(value)
+  }
+
+  function handleJarakInput(event) {
+    const value = event.target.value.replace(/[^\d]/g, '')
+    form.jarak = value
+    event.target.value = formatCurrency(value)
+  }
+
+  function formatTimeFromTimestamp(timestamp) {
+    if (!timestamp) return ''
+    const date = new Date(timestamp)
+    return date.toTimeString().slice(0, 5) // Format HH:MM
+  }
+
   function getStatusText(status) {
     const texts = {
       'draft': 'Draft',
@@ -126,6 +159,21 @@
     if (form.actual_cost) {
       const actualInput = document.getElementById('actual_cost')
       if (actualInput) actualInput.value = formatCurrency(form.actual_cost)
+    }
+    if (form.kilometer) {
+      const kilometerInput = document.getElementById('kilometer')
+      if (kilometerInput) kilometerInput.value = formatCurrency(form.kilometer)
+    }
+    if (form.jarak) {
+      const jarakInput = document.getElementById('jarak')
+      if (jarakInput) jarakInput.value = formatCurrency(form.jarak)
+    }
+    // Format time fields if they are timestamps
+    if (form.jam_masuk && typeof form.jam_masuk === 'number') {
+      form.jam_masuk = formatTimeFromTimestamp(form.jam_masuk)
+    }
+    if (form.jam_janji_selesai && typeof form.jam_janji_selesai === 'number') {
+      form.jam_janji_selesai = formatTimeFromTimestamp(form.jam_janji_selesai)
     }
   }
 
@@ -252,6 +300,113 @@
           {#if errors.service_description}
             <p class="mt-1 text-sm text-red-600">{errors.service_description}</p>
           {/if}
+        </div>
+
+        <!-- Keluhan Customer -->
+        <div>
+          <label for="keluhan" class="block text-sm font-medium text-gray-700 mb-2">
+            Keluhan Customer
+          </label>
+          <textarea
+            id="keluhan"
+            bind:value={form.keluhan}
+            on:input={handleInputChange}
+            rows="3"
+            placeholder="Keluhan atau masalah yang dilaporkan customer..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent {errors.keluhan ? 'border-red-300' : ''}"
+          ></textarea>
+          {#if errors.keluhan}
+            <p class="mt-1 text-sm text-red-600">{errors.keluhan}</p>
+          {/if}
+        </div>
+
+        <!-- Kilometer dan Jarak -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Kilometer -->
+          <div>
+            <label for="kilometer" class="block text-sm font-medium text-gray-700 mb-2">
+              Kilometer Kendaraan
+            </label>
+            <div class="relative">
+              <input
+                type="text"
+                id="kilometer"
+                on:input={handleKilometerInput}
+                on:change={handleInputChange}
+                placeholder="0"
+                class="w-full pr-12 pl-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent {errors.kilometer ? 'border-red-300' : ''}"
+              />
+              <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <span class="text-gray-500 sm:text-sm">KM</span>
+              </div>
+            </div>
+            {#if errors.kilometer}
+              <p class="mt-1 text-sm text-red-600">{errors.kilometer}</p>
+            {/if}
+          </div>
+
+          <!-- Jarak -->
+          <div>
+            <label for="jarak" class="block text-sm font-medium text-gray-700 mb-2">
+              Jarak (KM)
+            </label>
+            <div class="relative">
+              <input
+                type="text"
+                id="jarak"
+                on:input={handleJarakInput}
+                on:change={handleInputChange}
+                placeholder="0"
+                class="w-full pr-12 pl-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent {errors.jarak ? 'border-red-300' : ''}"
+              />
+              <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <span class="text-gray-500 sm:text-sm">KM</span>
+              </div>
+            </div>
+            {#if errors.jarak}
+              <p class="mt-1 text-sm text-red-600">{errors.jarak}</p>
+            {/if}
+            <p class="mt-1 text-sm text-gray-500">Otomatis terisi dari kilometer, bisa diubah manual</p>
+          </div>
+        </div>
+
+        <!-- Jam Masuk dan Jam Janji Selesai -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Jam Masuk -->
+          <div>
+            <label for="jam_masuk" class="block text-sm font-medium text-gray-700 mb-2">
+              Jam Masuk
+            </label>
+            <input
+              type="time"
+              id="jam_masuk"
+              bind:value={form.jam_masuk}
+              on:change={handleInputChange}
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent {errors.jam_masuk ? 'border-red-300' : ''}"
+            />
+            {#if errors.jam_masuk}
+              <p class="mt-1 text-sm text-red-600">{errors.jam_masuk}</p>
+            {/if}
+            <p class="mt-1 text-sm text-gray-500">Waktu kendaraan masuk bengkel</p>
+          </div>
+
+          <!-- Jam Janji Selesai -->
+          <div>
+            <label for="jam_janji_selesai" class="block text-sm font-medium text-gray-700 mb-2">
+              Jam Janji Selesai
+            </label>
+            <input
+              type="time"
+              id="jam_janji_selesai"
+              bind:value={form.jam_janji_selesai}
+              on:change={handleInputChange}
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent {errors.jam_janji_selesai ? 'border-red-300' : ''}"
+            />
+            {#if errors.jam_janji_selesai}
+              <p class="mt-1 text-sm text-red-600">{errors.jam_janji_selesai}</p>
+            {/if}
+            <p class="mt-1 text-sm text-gray-500">Estimasi waktu selesai pekerjaan</p>
+          </div>
         </div>
 
         <!-- Cost Fields -->
