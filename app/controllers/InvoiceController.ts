@@ -151,8 +151,9 @@ class InvoiceController {
                 tax_amount: taxAmt,
                 discount_amount: discountAmt,
                 total_amount: totalAmount,
-                status: 'draft',
+                status: 'paid',
                 invoice_date: now,
+                paid_date: now,
                 notes: notes?.trim() || null,
                 created_at: now,
                 updated_at: now
@@ -333,6 +334,51 @@ class InvoiceController {
             console.error('Error deleting invoice:', error);
             return response.status(500).json({
                 error: "Terjadi kesalahan saat menghapus invoice"
+            });
+        }
+    }
+
+    public async printPdf(request: Request, response: Response) {
+        try {
+            const { id } = request.params;
+            
+            const invoice = await DB.from("invoices")
+                .select(
+                    "invoices.*",
+                    "spk.spk_number",
+                    "spk.service_description",
+                    "vehicles.license_plate",
+                    "vehicles.brand",
+                    "vehicles.model",
+                    "customers.name as customer_name",
+                    "customers.phone as customer_phone",
+                    "customers.address as customer_address"
+                )
+                .leftJoin("spk", "invoices.spk_id", "spk.id")
+                .leftJoin("vehicles", "spk.vehicle_id", "vehicles.id")
+                .leftJoin("customers", "vehicles.customer_id", "customers.id")
+                .where("invoices.id", id)
+                .first();
+            
+            if (!invoice) {
+                return response.status(404).json({
+                    error: "Invoice tidak ditemukan"
+                });
+            }
+
+            // Get invoice items
+            const invoiceItems = await DB.from("invoice_items")
+                .where("invoice_id", id)
+                .orderBy('created_at');
+            
+            return response.inertia("invoices/pdf", {
+                invoice,
+                invoiceItems
+            });
+        } catch (error) {
+            console.error('Error generating invoice PDF:', error);
+            return response.status(500).json({
+                error: "Terjadi kesalahan saat membuat PDF invoice"
             });
         }
     }

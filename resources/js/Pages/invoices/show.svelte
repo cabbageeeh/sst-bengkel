@@ -59,8 +59,15 @@
     })
   }
 
-  function handlePrint() {
-    window.print()
+  function handlePrintPdf() {
+    // Buka halaman PDF dalam window kecil yang langsung trigger print
+    const printWindow = window.open(`/invoices/${invoice.id}/pdf`, '_blank', 'width=400,height=600,scrollbars=yes');
+    
+    if (printWindow) {
+      printWindow.addEventListener('load', () => {
+        printWindow.print();
+      });
+    }
   }
 </script>
 
@@ -106,13 +113,13 @@
         </div>
         <div class="flex space-x-3 print:hidden">
           <button
-            on:click={handlePrint}
-            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+            on:click={handlePrintPdf}
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           >
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
-            Print
+            Print Nota
           </button>
           <a
             href="/invoices/{invoice.id}/edit"

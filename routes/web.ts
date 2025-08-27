@@ -100,6 +100,7 @@ Route.get("/invoices/create", InvoiceController.create);
 Route.post("/invoices", InvoiceController.store);
 Route.get("/invoices/:id", InvoiceController.show);
 Route.get("/invoices/:id/edit", InvoiceController.edit);
+Route.get("/invoices/:id/pdf", InvoiceController.printPdf);
 Route.put("/invoices/:id", InvoiceController.update);
 Route.delete("/invoices/:id", InvoiceController.destroy);
 
