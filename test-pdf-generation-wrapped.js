@@ -8,6 +8,8 @@ const sampleSpkData = {
     spk_number: 'SPK-202412-0001',
     tanggal_masuk: Date.now(),
     tanggal_keluar: Date.now() + (24 * 60 * 60 * 1000), // +1 day
+    jam_masuk: Date.now(), // Jam masuk untuk field terpisah
+    jam_janji_selesai: Date.now() + (8 * 60 * 60 * 1000), // +8 hours
     customer_name: 'Dani Rama',
     customer_address: 'Jl. Contoh Alamat Yang Sangat Panjang Sekali No. 123, RT 05/RW 07, Kelurahan Contoh, Kecamatan Sample, Jakarta Selatan 12345',
     customer_phone: '081234567890',
@@ -16,10 +18,10 @@ const sampleSpkData = {
     model: 'Avanza',
     year: 2020,
     kilometer: 45000,
+    jarak: 45000, // Jarak sama dengan kilometer
     keluhan: 'Mesin bersuara kasar dan oli bocor, ada bunyi tidak normal dari bagian depan, kemungkinan masalah pada bearing atau komponen transmisi, perlu pemeriksaan menyeluruh untuk mengetahui sumber masalah yang sebenarnya',
     service_description: 'Ganti oli mesin menggunakan oli sintetik SAE 5W-30, tune up lengkap termasuk ganti busi, filter udara, dan filter oli, perbaikan kebocoran oli pada bagian gasket kepala silinder, pembersihan throttle body, pemeriksaan sistem pendingin dan radiator, serta general check up untuk semua komponen kendaraan',
     estimated_cost: 750000,
-    actual_cost: 720000,
     status: 'completed'
 };
 
@@ -37,6 +39,14 @@ function formatDate(timestamp) {
 function formatDateTime(timestamp) {
     if (!timestamp) return '';
     return dayjs(timestamp).format('DD/MM/YYYY HH:mm');
+}
+
+/**
+ * Format waktu saja untuk display (jam masuk dan jam janji selesai)
+ */
+function formatTime(timestamp) {
+    if (!timestamp) return '';
+    return dayjs(timestamp).format('HH:mm');
 }
 
 /**
@@ -213,16 +223,16 @@ async function fillFormFields(form, spkData) {
             'year': spkData.year?.toString(),
             'tahun': spkData.year?.toString(),
             'kilometer': spkData.kilometer?.toString(),
+            'jarak': spkData.jarak?.toString(), // Jarak (KM) - sama dengan kilometer
+            'jarak_km': spkData.jarak?.toString(),
             'keluhan': spkData.keluhan,
             'service_description': spkData.service_description,
             'service': spkData.service_description,
-            'jam_masuk': formatDateTime(spkData.tanggal_masuk),
-            'jam_janji_selesai': formatDateTime(spkData.tanggal_keluar),
+            'jam_masuk': formatTime(spkData.jam_masuk),
+            'jam_janji_selesai': formatTime(spkData.jam_janji_selesai),
             'tanggal_keluar': formatDateTime(spkData.tanggal_keluar),
             'estimated_cost': formatCurrency(spkData.estimated_cost),
-            'estimasi_biaya': formatCurrency(spkData.estimated_cost),
-            'actual_cost': formatCurrency(spkData.actual_cost),
-            'biaya_aktual': formatCurrency(spkData.actual_cost)
+            'estimasi_biaya': formatCurrency(spkData.estimated_cost)
         };
 
         console.log('🔧 Filling form fields:');
@@ -284,16 +294,18 @@ async function overlayTextOnPdf(pdfDoc, spkData) {
             { label: 'SPK Number', text: spkData.spk_number, x: 450, y: 760, maxWidth: rightColumnWidth },
             { label: 'Tanggal Masuk', text: formatDate(spkData.tanggal_masuk), x: 450, y: 740, maxWidth: rightColumnWidth },
             { label: 'Nama Customer', text: spkData.customer_name, x: 100, y: 657, maxWidth: leftColumnWidth },
-            { label: 'Alamat', text: spkData.customer_address, x: 100, y: 620, maxWidth: leftColumnWidth },
+            { label: 'Alamat', text: spkData.customer_address, x: 100, y: 630, maxWidth: leftColumnWidth },
             { label: 'No Telp', text: spkData.customer_phone, x: 100, y: 549, maxWidth: leftColumnWidth },
             { label: 'No Polisi', text: spkData.license_plate, x: 345, y: 657, maxWidth: rightColumnWidth },
             { label: 'Type/Model', text: `${spkData.brand} ${spkData.model}`, x: 345, y: 622, maxWidth: rightColumnWidth },
             { label: 'Tahun', text: spkData.year?.toString(), x: 345, y: 580, maxWidth: rightColumnWidth },
             { label: 'Kilometer', text: spkData.kilometer?.toString(), x: 345, y: 549, maxWidth: rightColumnWidth },
-            { label: 'Service', text: spkData.service_description, x: 40, y: 480, maxWidth: fullWidth - 200 }, // Full width for long text
-            { label: 'Keluhan', text: spkData.keluhan, x: 260, y: 480, maxWidth: fullWidth - 120 }, // Remaining width after service
-            { label: 'Estimasi Biaya', text: formatCurrency(spkData.estimated_cost), x: 100, y: 105, maxWidth: leftColumnWidth },
-            { label: 'Biaya Aktual', text: formatCurrency(spkData.actual_cost), x: 300, y: 105, maxWidth: rightColumnWidth }
+            { label: 'Jarak (KM)', text: spkData.jarak?.toString(), x: 131, y: 156, maxWidth: leftColumnWidth }, // Field jarak
+            { label: 'Jam Masuk', text: formatTime(spkData.jam_masuk), x: 131, y: 170, maxWidth: rightColumnWidth }, // Jam masuk
+            { label: 'Jam Janji Selesai', text: formatTime(spkData.jam_janji_selesai), x: 100, y: 490, maxWidth: leftColumnWidth }, // Jam janji selesai
+            { label: 'Service', text: spkData.service_description, x: 40, y: 450, maxWidth: fullWidth - 200 }, // Adjusted Y position
+            { label: 'Keluhan', text: spkData.keluhan, x: 260, y: 450, maxWidth: fullWidth - 120 }, // Adjusted Y position
+            { label: 'Estimasi Biaya', text: formatCurrency(spkData.estimated_cost), x: 100, y: 105, maxWidth: leftColumnWidth }
         ];
 
         console.log('🔧 Adding text overlays with auto-wrapping:');
@@ -364,6 +376,9 @@ async function main() {
         console.log('\n📋 Sample data used (with long text):');
         console.log('Customer Name:', sampleSpkData.customer_name);
         console.log('Address:', sampleSpkData.customer_address);
+        console.log('Jam Masuk:', formatTime(sampleSpkData.jam_masuk));
+        console.log('Jam Janji Selesai:', formatTime(sampleSpkData.jam_janji_selesai));
+        console.log('Jarak (KM):', sampleSpkData.jarak);
         console.log('Keluhan:', sampleSpkData.keluhan);
         console.log('Service:', sampleSpkData.service_description);
         
