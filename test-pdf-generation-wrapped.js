@@ -298,13 +298,13 @@ async function overlayTextOnPdf(pdfDoc, spkData) {
             { label: 'No Telp', text: spkData.customer_phone, x: 100, y: 549, maxWidth: leftColumnWidth },
             { label: 'No Polisi', text: spkData.license_plate, x: 345, y: 657, maxWidth: rightColumnWidth },
             { label: 'Type/Model', text: `${spkData.brand} ${spkData.model}`, x: 345, y: 622, maxWidth: rightColumnWidth },
-            { label: 'Tahun', text: spkData.year?.toString(), x: 345, y: 580, maxWidth: rightColumnWidth },
+            { label: 'Tahun', text: spkData.year?.toString(), x: 345, y: 590, maxWidth: rightColumnWidth },
             { label: 'Kilometer', text: spkData.kilometer?.toString(), x: 345, y: 549, maxWidth: rightColumnWidth },
-            { label: 'Jarak (KM)', text: spkData.jarak?.toString(), x: 131, y: 156, maxWidth: leftColumnWidth }, // Field jarak
-            { label: 'Jam Masuk', text: formatTime(spkData.jam_masuk), x: 131, y: 170, maxWidth: rightColumnWidth }, // Jam masuk
-            { label: 'Jam Janji Selesai', text: formatTime(spkData.jam_janji_selesai), x: 100, y: 490, maxWidth: leftColumnWidth }, // Jam janji selesai
-            { label: 'Service', text: spkData.service_description, x: 40, y: 450, maxWidth: fullWidth - 200 }, // Adjusted Y position
-            { label: 'Keluhan', text: spkData.keluhan, x: 260, y: 450, maxWidth: fullWidth - 120 }, // Adjusted Y position
+            { label: 'Jarak (KM)', text: spkData.jarak?.toString(), x: 131, y: 159, maxWidth: leftColumnWidth }, // Field jarak
+            { label: 'Jam Masuk', text: formatTime(spkData.jam_masuk), x: 131, y: 190, maxWidth: rightColumnWidth }, // Jam masuk
+            { label: 'Jam Janji Selesai', text: formatTime(spkData.jam_janji_selesai), x: 131, y: 174, maxWidth: leftColumnWidth }, // Jam janji selesai
+            { label: 'Service', text: spkData.service_description, x: 40, y: 490, maxWidth: fullWidth - 200 }, // Adjusted Y position
+            { label: 'Keluhan', text: spkData.keluhan, x: 260, y: 490, maxWidth: fullWidth - 120 }, // Adjusted Y position
             { label: 'Estimasi Biaya', text: formatCurrency(spkData.estimated_cost), x: 100, y: 105, maxWidth: leftColumnWidth }
         ];
 
