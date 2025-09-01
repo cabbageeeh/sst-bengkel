@@ -51,6 +51,16 @@ class PdfService {
             const fields = form.getFields();
             console.log('Available form fields:', fields.map(field => field.getName()));
 
+            // Prepare service items text
+            const serviceItemsText = spkData.service_items?.map((item: any) => 
+                `${item.item_name}: ${this.formatCurrency(item.total_price)}`
+            ).join('\n') || '';
+
+            // Prepare sparepart items text
+            const sparepartItemsText = spkData.sparepart_items?.map((item: any) => 
+                `${item.item_name} (${item.quantity}x): ${this.formatCurrency(item.total_price)}`
+            ).join('\n') || '';
+
             // Map data SPK ke form fields (sesuaikan dengan nama field di PDF)
             const fieldMappings = {
                 'spk_number': spkData.spk_number,
@@ -86,7 +96,18 @@ class PdfService {
                 'estimated_cost': this.formatCurrency(spkData.estimated_cost),
                 'estimasi_biaya': this.formatCurrency(spkData.estimated_cost),
                 'actual_cost': this.formatCurrency(spkData.actual_cost),
-                'biaya_aktual': this.formatCurrency(spkData.actual_cost)
+                'biaya_aktual': this.formatCurrency(spkData.actual_cost),
+                // New fields for service and sparepart breakdown
+                'service_items': serviceItemsText,
+                'biaya_service': serviceItemsText,
+                'jasa_service': serviceItemsText,
+                'service_total': this.formatCurrency(spkData.service_total || 0),
+                'total_service': this.formatCurrency(spkData.service_total || 0),
+                'sparepart_items': sparepartItemsText,
+                'list_sparepart': sparepartItemsText,
+                'sparepart_list': sparepartItemsText,
+                'sparepart_total': this.formatCurrency(spkData.sparepart_total || 0),
+                'total_sparepart': this.formatCurrency(spkData.sparepart_total || 0)
             };
 
             // Isi form fields yang tersedia
@@ -134,6 +155,16 @@ class PdfService {
             const fullWidth = width - 100; // Full width minus margins
             const marginRight = 50; // Right margin
 
+            // Prepare service items text
+            const serviceItemsText = spkData.service_items?.map((item: any) => 
+                `${item.item_name}: ${this.formatCurrency(item.total_price)}`
+            ).join('\n') || '';
+
+            // Prepare sparepart items text
+            const sparepartItemsText = spkData.sparepart_items?.map((item: any) => 
+                `${item.item_name} (${item.quantity}x): ${this.formatCurrency(item.total_price)}`
+            ).join('\n') || '';
+
             // Koordinat untuk masing-masing field dengan area width
             const textPositions = [
                 { label: 'SPK Number', text: spkData.spk_number, x: 450, y: 760, maxWidth: rightColumnWidth },
@@ -150,7 +181,13 @@ class PdfService {
                 { label: 'Jam Janji Selesai', text: this.formatTime(spkData.jam_janji_selesai), x: 131, y: 174, maxWidth: leftColumnWidth }, // Jam janji selesai
                 { label: 'Service', text: spkData.service_description, x: 40, y: 490, maxWidth: fullWidth - 200 }, // Adjusted Y position
                 { label: 'Keluhan', text: spkData.keluhan, x: 260, y: 490, maxWidth: fullWidth - 120 }, // Adjusted Y position
-                { label: 'Estimasi Biaya', text: this.formatCurrency(spkData.estimated_cost), x: 100, y: 105, maxWidth: leftColumnWidth }
+                { label: 'Estimasi Biaya', text: this.formatCurrency(spkData.estimated_cost), x: 100, y: 105, maxWidth: leftColumnWidth },
+                // New positions for service and sparepart breakdown
+                { label: 'Biaya Service', text: serviceItemsText, x: 100, y: 350, maxWidth: leftColumnWidth },
+                { label: 'Total Service', text: this.formatCurrency(spkData.service_total || 0), x: 100, y: 320, maxWidth: leftColumnWidth },
+                { label: 'List Sparepart', text: sparepartItemsText, x: 100, y: 280, maxWidth: fullWidth - 100 },
+                { label: 'Total Sparepart', text: this.formatCurrency(spkData.sparepart_total || 0), x: 100, y: 200, maxWidth: leftColumnWidth },
+                { label: 'Total Keseluruhan', text: this.formatCurrency(spkData.actual_cost), x: 100, y: 170, maxWidth: leftColumnWidth }
             ];
 
             console.log('🔧 Adding text overlays with auto-wrapping:');

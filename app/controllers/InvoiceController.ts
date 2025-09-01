@@ -117,8 +117,16 @@ class InvoiceController {
                 });
             }
 
-            // Calculate totals
-            const subtotal = parseFloat(spk.actual_cost) || 0;
+            // Get SPK items to transfer to invoice items
+            const spkItems = await DB.from("spk_items")
+                .where("spk_id", spk_id)
+                .orderBy('created_at');
+
+            // Calculate subtotal from SPK items
+            const subtotal = spkItems.reduce((total, item) => {
+                return total + (parseFloat(item.total_price) || 0);
+            }, 0);
+            
             const taxAmt = parseFloat(tax_amount) || 0;
             const discountAmt = parseFloat(discount_amount) || 0;
             const totalAmount = subtotal + taxAmt - discountAmt;
@@ -159,7 +167,26 @@ class InvoiceController {
                 updated_at: now
             };
 
+            // Insert invoice first
             await DB.from("invoices").insert(invoiceData);
+
+            // Transfer SPK items to invoice items
+            if (spkItems.length > 0) {
+                const invoiceItemsData = spkItems.map(item => ({
+                    id: uuidv4(),
+                    invoice_id: invoiceData.id,
+                    item_name: item.item_name,
+                    description: item.description,
+                    quantity: item.quantity,
+                    unit_price: item.unit_price,
+                    total_price: item.total_price,
+                    type: item.type,
+                    created_at: now,
+                    updated_at: now
+                }));
+
+                await DB.from("invoice_items").insert(invoiceItemsData);
+            }
 
             return response.redirect("/invoices?success=Invoice berhasil dibuat");
         } catch (error) {

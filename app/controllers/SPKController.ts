@@ -19,6 +19,28 @@ function timeStringToTimestamp(timeString: string): number | null {
 }
 
 class SPKController {
+    constructor() {
+        this.complete = this.complete.bind(this);
+        this.calculateTotalCost = this.calculateTotalCost.bind(this);
+        this.calculateSparepartTotal = this.calculateSparepartTotal.bind(this);
+    }
+
+    /**
+     * Helper method to calculate total cost from service and sparepart items
+     */
+    public calculateTotalCost(serviceCost: number, sparepartItems: any[]): number {
+        const sparepartTotal = this.calculateSparepartTotal(sparepartItems);
+        return serviceCost + sparepartTotal;
+    }
+
+    /**
+     * Helper method to calculate sparepart total cost
+     */
+    public calculateSparepartTotal(sparepartItems: any[]): number {
+        return sparepartItems.reduce((total, item) => {
+            return total + (item.unit_price * item.quantity);
+        }, 0);
+    }
 
     public async index(request: Request, response: Response) {
         try {
@@ -367,7 +389,7 @@ class SPKController {
     public async complete(request: Request, response: Response) {
         try {
             const { id } = request.params;
-            const { actual_cost } = await request.json();
+            const { service_cost, sparepart_items } = await request.json();
 
             // Get current SPK
             const currentSPK = await DB.from("spk")
@@ -387,34 +409,123 @@ class SPKController {
                 });
             }
 
-            // Validate actual_cost
-            if (!actual_cost || isNaN(parseFloat(actual_cost))) {
+            // Validate service_cost
+            if (!service_cost || isNaN(parseFloat(service_cost))) {
                 return response.status(422).json({
-                    error: "Biaya aktual harus diisi dengan angka yang valid"
+                    error: "Biaya service harus diisi dengan angka yang valid"
                 });
             }
 
-            const updateData: any = {
-                actual_cost: parseFloat(actual_cost),
-                status: 'completed',
-                tanggal_keluar: Date.now(),
-                updated_at: Date.now()
-            };
-
-            const updated = await DB.from("spk")
-                .where("id", id)
-                .update(updateData);
-
-            if (!updated) {
-                return response.status(404).json({
-                    error: "SPK tidak ditemukan"
+            // Validate sparepart_items
+            if (!Array.isArray(sparepart_items)) {
+                return response.status(422).json({
+                    error: "Data sparepart harus berupa array"
                 });
             }
 
-            return response.status(200).json({
-                success: true,
-                message: "SPK berhasil diselesaikan"
-            });
+            // Validate each sparepart item
+            for (const item of sparepart_items) {
+                if (!item.item_name || !item.item_name.trim()) {
+                    return response.status(422).json({
+                        error: "Nama item sparepart harus diisi"
+                    });
+                }
+                if (!item.quantity || isNaN(parseInt(item.quantity)) || parseInt(item.quantity) <= 0) {
+                    return response.status(422).json({
+                        error: "Quantity sparepart harus berupa angka positif"
+                    });
+                }
+                if (!item.unit_price || isNaN(parseFloat(item.unit_price)) || parseFloat(item.unit_price) <= 0) {
+                    return response.status(422).json({
+                        error: "Harga satuan sparepart harus berupa angka positif"
+                    });
+                }
+            }
+
+            // Calculate total actual cost using helper method
+            const totalActualCost = this.calculateTotalCost(parseFloat(service_cost), sparepart_items.map(item => ({
+                unit_price: parseFloat(item.unit_price),
+                quantity: parseInt(item.quantity)
+            })));
+            const totalSparepartCost = this.calculateSparepartTotal(sparepart_items.map(item => ({
+                unit_price: parseFloat(item.unit_price),
+                quantity: parseInt(item.quantity)
+            })));
+
+            // Start transaction
+            const trx = await DB.transaction();
+
+            try {
+                // Update SPK status and actual cost
+                const updateData: any = {
+                    actual_cost: totalActualCost,
+                    status: 'completed',
+                    tanggal_keluar: Date.now(),
+                    updated_at: Date.now()
+                };
+
+                await trx.from("spk")
+                    .where("id", id)
+                    .update(updateData);
+
+                // Delete existing spk_items for this SPK (in case of re-completion)
+                await trx.from("spk_items")
+                    .where("spk_id", id)
+                    .del();
+
+                // Insert service item
+                const serviceItemId = uuidv4();
+                await trx.from("spk_items").insert({
+                    id: serviceItemId,
+                    spk_id: id,
+                    item_name: "Jasa Service",
+                    description: currentSPK.service_description,
+                    quantity: 1,
+                    unit_price: parseFloat(service_cost),
+                    total_price: parseFloat(service_cost),
+                    type: 'service',
+                    created_at: Date.now(),
+                    updated_at: Date.now()
+                });
+
+                // Insert sparepart items
+                for (const item of sparepart_items) {
+                    const itemId = uuidv4();
+                    const quantity = parseInt(item.quantity);
+                    const unitPrice = parseFloat(item.unit_price);
+                    const totalPrice = quantity * unitPrice;
+
+                    await trx.from("spk_items").insert({
+                        id: itemId,
+                        spk_id: id,
+                        item_name: item.item_name.trim(),
+                        description: item.description?.trim() || null,
+                        quantity: quantity,
+                        unit_price: unitPrice,
+                        total_price: totalPrice,
+                        type: 'part',
+                        created_at: Date.now(),
+                        updated_at: Date.now()
+                    });
+                }
+
+                // Commit transaction
+                await trx.commit();
+
+                return response.status(200).json({
+                    success: true,
+                    message: "SPK berhasil diselesaikan dengan rincian biaya",
+                    data: {
+                        service_cost: parseFloat(service_cost),
+                        sparepart_cost: totalSparepartCost,
+                        total_cost: totalActualCost
+                    }
+                });
+            } catch (error) {
+                // Rollback transaction
+                await trx.rollback();
+                throw error;
+            }
         } catch (error) {
             console.error('Error completing SPK:', error);
             return response.status(500).json({
@@ -451,8 +562,27 @@ class SPKController {
                 });
             }
 
+            // Get SPK items (service and spareparts)
+            const spkItems = await DB.from("spk_items")
+                .where("spk_id", id)
+                .orderBy("type", "asc") // service first, then parts
+                .orderBy("created_at", "asc");
+
+            // Separate service and sparepart items
+            const serviceItems = spkItems.filter(item => item.type === 'service');
+            const sparepartItems = spkItems.filter(item => item.type === 'part');
+
+            // Add items data to SPK object
+            const spkWithItems = {
+                ...spk,
+                service_items: serviceItems,
+                sparepart_items: sparepartItems,
+                service_total: serviceItems.reduce((total, item) => total + parseFloat(item.total_price), 0),
+                sparepart_total: sparepartItems.reduce((total, item) => total + parseFloat(item.total_price), 0)
+            };
+
             // Generate PDF menggunakan template yang sudah ada
-            const pdfBuffer = await PdfService.generateSpkPdf(spk);
+            const pdfBuffer = await PdfService.generateSpkPdf(spkWithItems);
             
             // Set response headers untuk download PDF
             response.setHeader('Content-Type', 'application/pdf');

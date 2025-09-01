@@ -17,8 +17,9 @@
   // Modal state for completing SPK
   let showCompleteModal = false
   let selectedSPK = null
-  let actualCost = ''
-  let actualCostDisplay = ''
+  let serviceCost = ''
+  let serviceCostDisplay = ''
+  let sparepartItems = []
   let isSubmitting = false
 
   function handleSearch() {
@@ -88,10 +89,53 @@
     return value.replace(/\D/g, '')
   }
   
-  function handleActualCostInput(event) {
+  function handleServiceCostInput(event) {
     const value = event.target.value
-    actualCost = parseNumberInput(value)
-    actualCostDisplay = formatNumberInput(value)
+    serviceCost = parseNumberInput(value)
+    serviceCostDisplay = formatNumberInput(value)
+  }
+
+  function addSparepartItem() {
+    sparepartItems = [...sparepartItems, {
+      item_name: '',
+      quantity: 1,
+      unit_price: '',
+      unit_price_display: '',
+      total_price: 0
+    }]
+  }
+
+  function removeSparepartItem(index) {
+    sparepartItems = sparepartItems.filter((_, i) => i !== index)
+  }
+
+  function handleSparepartInput(index, field, event) {
+    const value = event.target.value
+    const updatedItems = [...sparepartItems]
+    
+    if (field === 'unit_price') {
+      updatedItems[index].unit_price = parseNumberInput(value)
+      updatedItems[index].unit_price_display = formatNumberInput(value)
+    } else if (field === 'quantity') {
+      updatedItems[index].quantity = parseInt(value) || 1
+    } else {
+      updatedItems[index][field] = value
+    }
+    
+    // Calculate total price
+    const quantity = updatedItems[index].quantity || 1
+    const unitPrice = parseFloat(updatedItems[index].unit_price) || 0
+    updatedItems[index].total_price = quantity * unitPrice
+    
+    sparepartItems = updatedItems
+  }
+
+  function calculateTotalCost() {
+    const serviceTotal = parseFloat(serviceCost) || 0
+    const sparepartTotal = sparepartItems.reduce((total, item) => {
+      return total + (item.total_price || 0)
+    }, 0)
+    return serviceTotal + sparepartTotal
   }
   
   async function deleteSPK(spk) {
@@ -134,33 +178,62 @@
   
   function openCompleteModal(spk) {
     selectedSPK = spk
+    // Initialize with estimated cost as service cost if available
     if (spk.estimated_cost) {
-      actualCost = spk.estimated_cost.toString()
-      actualCostDisplay = formatNumberInput(actualCost)
+      serviceCost = spk.estimated_cost.toString()
+      serviceCostDisplay = formatNumberInput(serviceCost)
     } else {
-      actualCost = ''
-      actualCostDisplay = ''
+      serviceCost = ''
+      serviceCostDisplay = ''
     }
+    // Initialize with one empty sparepart item
+    sparepartItems = [{
+      item_name: '',
+      quantity: 1,
+      unit_price: '',
+      unit_price_display: '',
+      total_price: 0
+    }]
     showCompleteModal = true
   }
   
   function closeCompleteModal() {
     showCompleteModal = false
     selectedSPK = null
-    actualCost = ''
-    actualCostDisplay = ''
+    serviceCost = ''
+    serviceCostDisplay = ''
+    sparepartItems = []
     isSubmitting = false
   }
   
   async function completeSPK() {
-    if (!selectedSPK || !actualCost.trim()) {
-      Toast('Biaya aktual harus diisi', 'error')
+    // Validate service cost
+    if (!selectedSPK || !serviceCost.trim()) {
+      Toast('Biaya service harus diisi', 'error')
       return
     }
     
-    if (isNaN(parseFloat(actualCost))) {
-      Toast('Biaya aktual harus berupa angka yang valid', 'error')
+    if (isNaN(parseFloat(serviceCost))) {
+      Toast('Biaya service harus berupa angka yang valid', 'error')
       return
+    }
+
+    // Validate sparepart items
+    const validSparepartItems = sparepartItems.filter(item => item.item_name.trim())
+    
+    for (const item of validSparepartItems) {
+      if (!item.item_name.trim()) {
+        Toast('Nama sparepart harus diisi', 'error')
+        return
+      }
+      if (!item.quantity || item.quantity <= 0) {
+        Toast('Quantity sparepart harus lebih dari 0', 'error')
+        return
+      }
+      if (!item.unit_price || parseFloat(item.unit_price) <= 0) {
+        Toast('Harga satuan sparepart harus lebih dari 0', 'error')
+        return
+      }
     }
     
     isSubmitting = true
@@ -173,7 +246,13 @@
         },
         credentials: 'include',
         body: JSON.stringify({
-          actual_cost: parseFloat(actualCost)
+          service_cost: parseFloat(serviceCost),
+          sparepart_items: validSparepartItems.map(item => ({
+            item_name: item.item_name.trim(),
+            quantity: item.quantity,
+            unit_price: parseFloat(item.unit_price),
+            description: item.description || ''
+          }))
         })
       })
       
@@ -486,7 +565,7 @@
 <!-- Modal Selesai SPK -->
 {#if showCompleteModal}
   <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" transition:fade>
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div class="relative top-10 mx-auto p-5 border max-w-4xl shadow-lg rounded-md bg-white">
       <div class="mt-3">
         <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
           <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -496,25 +575,124 @@
         <div class="mt-3 text-center">
           <h3 class="text-lg leading-6 font-medium text-gray-900">Selesaikan SPK</h3>
           {#if selectedSPK}
-            <div class="mt-2">
+            <div class="mt-2 mb-6">
               <p class="text-sm text-gray-500">SPK: <span class="font-semibold">{selectedSPK.spk_number}</span></p>
               <p class="text-sm text-gray-500">{selectedSPK.license_plate} - {selectedSPK.customer_name}</p>
+              <p class="text-sm text-gray-500">Estimasi: {formatCurrency(selectedSPK.estimated_cost)}</p>
+            </div>
+            
+            <!-- Service Cost Section -->
+            <div class="mb-6 text-left">
+              <h4 class="text-md font-medium text-gray-900 mb-3">Biaya Service</h4>
+              <div class="mb-4">
+                <label for="serviceCost" class="block text-sm font-medium text-gray-700 mb-2">
+                  Biaya Service (Rp)
+                </label>
+                <input
+                  type="text"
+                  id="serviceCost"
+                  value={serviceCostDisplay}
+                  on:input={handleServiceCostInput}
+                  placeholder="Masukkan biaya service"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  disabled={isSubmitting}
+                />
+              </div>
+            </div>
+
+            <!-- Sparepart Section -->
+            <div class="mb-6 text-left">
+              <div class="flex justify-between items-center mb-3">
+                <h4 class="text-md font-medium text-gray-900">Sparepart</h4>
+                <button 
+                  type="button" 
+                  class="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                  on:click={addSparepartItem} 
+                  disabled={isSubmitting}
+                >
+                  + Tambah Item
+                </button>
+              </div>
+              
+              {#if sparepartItems.length > 0}
+                <div class="border border-gray-300 rounded-md overflow-hidden">
+                  <div class="bg-gray-50 grid grid-cols-12 gap-2 p-3 text-sm font-medium text-gray-700">
+                    <div class="col-span-4">Nama Item</div>
+                    <div class="col-span-2">Qty</div>
+                    <div class="col-span-3">Harga Satuan</div>
+                    <div class="col-span-2">Total</div>
+                    <div class="col-span-1">Aksi</div>
+                  </div>
+                  
+                  {#each sparepartItems as item, index}
+                    <div class="grid grid-cols-12 gap-2 p-3 border-t border-gray-200">
+                      <div class="col-span-4">
+                        <input 
+                          type="text" 
+                          bind:value={item.item_name}
+                          on:input={(e) => handleSparepartInput(index, 'item_name', e)}
+                          placeholder="Nama sparepart"
+                          class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                      <div class="col-span-2">
+                        <input 
+                          type="number" 
+                          bind:value={item.quantity}
+                          on:input={(e) => handleSparepartInput(index, 'quantity', e)}
+                          min="1"
+                          class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                      <div class="col-span-3">
+                        <input 
+                          type="text" 
+                          bind:value={item.unit_price_display}
+                          on:input={(e) => handleSparepartInput(index, 'unit_price', e)}
+                          placeholder="0"
+                          class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                      <div class="col-span-2 flex items-center">
+                        <span class="text-sm">{formatCurrency(item.total_price)}</span>
+                      </div>
+                      <div class="col-span-1">
+                        <button 
+                          type="button" 
+                          class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 focus:outline-none focus:ring-1 focus:ring-red-500" 
+                          on:click={() => removeSparepartItem(index)}
+                          disabled={isSubmitting || sparepartItems.length === 1}
+                        >
+                          Hapus
+                        </button>
+                      </div>
+                    </div>
+                  {/each}
+                </div>
+              {/if}
+            </div>
+
+            <!-- Total Cost Summary -->
+            <div class="mb-6 bg-gray-50 p-4 rounded-md">
+              <div class="space-y-2">
+                <div class="flex justify-between text-sm">
+                  <span>Total Biaya Service:</span>
+                  <span>{formatCurrency(parseFloat(serviceCost) || 0)}</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span>Total Biaya Sparepart:</span>
+                  <span>{formatCurrency(sparepartItems.reduce((total, item) => total + (item.total_price || 0), 0))}</span>
+                </div>
+                <div class="flex justify-between text-lg font-semibold border-t pt-2">
+                  <span>Total Keseluruhan:</span>
+                  <span>{formatCurrency(calculateTotalCost())}</span>
+                </div>
+              </div>
             </div>
           {/if}
-          <div class="mt-4">
-            <label for="actualCost" class="block text-sm font-medium text-gray-700 text-left mb-2">
-              Biaya Aktual (Rp)
-            </label>
-            <input
-              type="text"
-              id="actualCost"
-              value={actualCostDisplay}
-              on:input={handleActualCostInput}
-              placeholder="Masukkan biaya aktual"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              disabled={isSubmitting}
-            />
-          </div>
         </div>
         <div class="items-center px-4 py-3">
           <div class="flex justify-end space-x-3">
@@ -528,7 +706,7 @@
             <button
               on:click={completeSPK}
               class="px-4 py-2 bg-green-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={isSubmitting || !actualCost.trim()}
+              disabled={isSubmitting || !serviceCost.trim()}
             >
               {#if isSubmitting}
                 <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" fill="none" viewBox="0 0 24 24">

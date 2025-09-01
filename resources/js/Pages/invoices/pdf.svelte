@@ -198,26 +198,52 @@
         <div>{invoice.license_plate} - {invoice.brand} {invoice.model}</div>
     </div>
 
-    <!-- Service Description -->
-    {#if invoice.service_description}
+    <!-- Service Items -->
+    {#if invoiceItems && invoiceItems.length > 0}
+        {@const serviceItems = invoiceItems.filter(item => item.type === 'service')}
+        {@const sparepartItems = invoiceItems.filter(item => item.type === 'part')}
+        
+        {#if serviceItems.length > 0}
+            <div style="margin: 3mm 0; font-size: 8px;">
+                <div><strong>Layanan:</strong></div>
+                <table class="items-table" style="margin-top: 1mm;">
+                    <tbody>
+                        {#each serviceItems as item}
+                            <tr>
+                                <td class="item-name">{item.item_name}</td>
+                                <td style="text-align: right; width: 20mm;">{formatCurrency(item.total_price)}</td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            </div>
+        {/if}
+        
+        {#if sparepartItems.length > 0}
+            <div style="margin: 3mm 0; font-size: 8px;">
+                <div><strong>Sparepart:</strong></div>
+                <table class="items-table" style="margin-top: 1mm;">
+                    <tbody>
+                        {#each sparepartItems as item}
+                            <tr>
+                                <td class="item-name">
+                                    {item.item_name}
+                                    {#if item.quantity > 1}
+                                        <span style="font-size: 7px; color: #666;">({item.quantity}x)</span>
+                                    {/if}
+                                </td>
+                                <td style="text-align: right; width: 20mm;">{formatCurrency(item.total_price)}</td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            </div>
+        {/if}
+    {:else if invoice.service_description}
         <div style="margin: 3mm 0; font-size: 8px;">
             <div><strong>Layanan:</strong></div>
             <div>{invoice.service_description}</div>
         </div>
-    {/if}
-
-    <!-- Items (jika ada) -->
-    {#if invoiceItems && invoiceItems.length > 0}
-        <table class="items-table">
-            <tbody>
-                {#each invoiceItems as item}
-                    <tr>
-                        <td class="item-name">{item.description}</td>
-                        <td style="text-align: right; width: 20mm;">{formatCurrency(item.amount)}</td>
-                    </tr>
-                {/each}
-            </tbody>
-        </table>
     {/if}
 
     <!-- Totals -->

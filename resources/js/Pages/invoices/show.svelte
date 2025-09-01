@@ -197,13 +197,70 @@
             </tbody>
           </table>
 
-          <!-- Service Details -->
-          <div class="service-details mb-6">
-            <h3 class="text-sm font-medium text-gray-900 mb-2">Deskripsi Pekerjaan:</h3>
-            <div class="bg-gray-50 print:bg-gray-100 p-3 rounded-md print:rounded-none border print:border-gray-300">
-              <p class="text-sm text-gray-700 whitespace-pre-wrap">{invoice.service_description}</p>
+          <!-- Service and Sparepart Details -->
+          {#if invoiceItems && invoiceItems.length > 0}
+            {@const serviceItems = invoiceItems.filter(item => item.type === 'service')}
+            {@const sparepartItems = invoiceItems.filter(item => item.type === 'part')}
+            
+            {#if serviceItems.length > 0}
+              <div class="service-details mb-6">
+                <h3 class="text-sm font-medium text-gray-900 mb-2">Layanan:</h3>
+                <div class="bg-gray-50 print:bg-gray-100 p-3 rounded-md print:rounded-none border print:border-gray-300">
+                  <div class="space-y-2">
+                    {#each serviceItems as item}
+                      <div class="flex justify-between items-center">
+                        <div class="text-sm text-gray-700">
+                          <div class="font-medium">{item.item_name}</div>
+                          {#if item.description && item.description !== item.item_name}
+                            <div class="text-xs text-gray-500">{item.description}</div>
+                          {/if}
+                        </div>
+                        <div class="text-sm font-medium text-gray-900">
+                          {formatCurrency(item.total_price)}
+                        </div>
+                      </div>
+                    {/each}
+                  </div>
+                </div>
+              </div>
+            {/if}
+            
+            {#if sparepartItems.length > 0}
+              <div class="sparepart-details mb-6">
+                <h3 class="text-sm font-medium text-gray-900 mb-2">Sparepart:</h3>
+                <div class="bg-gray-50 print:bg-gray-100 p-3 rounded-md print:rounded-none border print:border-gray-300">
+                  <div class="space-y-2">
+                    {#each sparepartItems as item}
+                      <div class="flex justify-between items-center">
+                        <div class="text-sm text-gray-700">
+                          <div class="font-medium">
+                            {item.item_name}
+                            {#if item.quantity > 1}
+                              <span class="text-xs text-gray-500">({item.quantity}x @ {formatCurrency(item.unit_price)})</span>
+                            {/if}
+                          </div>
+                          {#if item.description && item.description !== item.item_name}
+                            <div class="text-xs text-gray-500">{item.description}</div>
+                          {/if}
+                        </div>
+                        <div class="text-sm font-medium text-gray-900">
+                          {formatCurrency(item.total_price)}
+                        </div>
+                      </div>
+                    {/each}
+                  </div>
+                </div>
+              </div>
+            {/if}
+          {:else if invoice.service_description}
+            <!-- Fallback to service description if no items -->
+            <div class="service-details mb-6">
+              <h3 class="text-sm font-medium text-gray-900 mb-2">Deskripsi Pekerjaan:</h3>
+              <div class="bg-gray-50 print:bg-gray-100 p-3 rounded-md print:rounded-none border print:border-gray-300">
+                <p class="text-sm text-gray-700 whitespace-pre-wrap">{invoice.service_description}</p>
+              </div>
             </div>
-          </div>
+          {/if}
 
           <!-- Cost Breakdown Table -->
           <table class="cost-breakdown w-full border-t border-gray-300 pt-4">
