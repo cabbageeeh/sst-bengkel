@@ -60,14 +60,8 @@
   }
 
   function handlePrintPdf() {
-    // Buka halaman PDF dalam window kecil yang langsung trigger print
-    const printWindow = window.open(`/invoices/${invoice.id}/pdf`, '_blank', 'width=400,height=600,scrollbars=yes');
-    
-    if (printWindow) {
-      printWindow.addEventListener('load', () => {
-        printWindow.print();
-      });
-    }
+    // Halaman cetak akan membuka dialog print setelah layout A4 siap.
+    window.open(`/invoices/${invoice.id}/pdf`, '_blank', 'width=1000,height=900,resizable=yes,scrollbars=yes');
   }
 </script>
 
@@ -119,7 +113,7 @@
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
-            Print Nota
+            Cetak A4
           </button>
           <a
             href="/invoices/{invoice.id}/edit"
@@ -368,270 +362,69 @@
 
 <style>
   @media print {
-    /* Hide web elements */
+    @page {
+      size: A4 portrait;
+      margin: 14mm;
+    }
+
+    :global(html), :global(body) {
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #fff !important;
+      color: #111827;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 10pt;
+      line-height: 1.4;
+    }
+
     .print\:hidden {
       display: none !important;
     }
-    
-    /* Reset page layout for print */
-    @page {
-      margin: 1cm;
-      size: A4;
-    }
-    
-    /* Body and container reset */
-    body {
-      font-family: 'Times New Roman', serif;
-      font-size: 12px;
-      line-height: 1.4;
-      margin: 0;
-      padding: 0;
-      background: white !important;
-    }
-    
-    /* Remove web styling */
-    * {
-      box-shadow: none !important;
-      border-radius: 0 !important;
-      background-image: none !important;
-    }
-    
-    /* Main container */
+
     .min-h-screen {
-      min-height: auto !important;
-      background: white !important;
+      min-height: 0 !important;
+      background: #fff !important;
     }
-    
-    /* Invoice container optimization */
+
     .max-w-4xl {
-      max-width: 100% !important;
+      max-width: none !important;
       margin: 0 !important;
       padding: 0 !important;
     }
-    
-    /* Invoice content */
+
+    .print-layout {
+      max-height: none !important;
+      margin: 0 !important;
+      overflow: visible !important;
+      break-inside: auto !important;
+      page-break-inside: auto !important;
+    }
+
+    .print-body, .service-details, .sparepart-details, .cost-breakdown {
+      break-inside: auto !important;
+      page-break-inside: auto !important;
+    }
+
+    .print-header, .customer-info {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
     .bg-white {
-      background: white !important;
+      background: #fff !important;
       box-shadow: none !important;
       border-radius: 0 !important;
-      margin: 0 !important;
     }
-    
-    /* Typography optimization for print */
+
     h1, h2, h3, h4 {
-      color: black !important;
-      page-break-after: avoid;
-      margin-top: 0 !important;
-      margin-bottom: 0.25rem !important;
-    }
-    
-    h1 {
-      font-size: 16px !important;
-      font-weight: bold;
-      line-height: 1.2;
-    }
-    
-    h2 {
-      font-size: 14px !important;
-      font-weight: bold;
-      line-height: 1.2;
-    }
-    
-    h3 {
-      font-size: 12px !important;
-      font-weight: bold;
-      line-height: 1.2;
-    }
-    
-    h4 {
-      font-size: 11px !important;
-      font-weight: bold;
-      line-height: 1.2;
-    }
-    
-    /* Page break control */
-    .print-layout {
-      page-break-inside: avoid;
-      height: auto !important;
-      max-height: 26cm !important; /* A4 height minus margins */
-    }
-    
-    .print-header {
-      page-break-after: avoid;
-      page-break-inside: avoid;
-    }
-    
-    .print-body {
-      page-break-inside: avoid;
-    }
-    
-    .customer-info {
-      page-break-inside: avoid;
+      color: #111827 !important;
+      break-after: avoid;
       page-break-after: avoid;
     }
-    
-    .service-details {
-      page-break-inside: avoid;
-      page-break-after: avoid;
-    }
-    
-    .cost-breakdown {
-      page-break-before: avoid;
-      page-break-inside: avoid;
-    }
-    
-    /* Prevent orphans and widows */
+
     p {
       orphans: 3;
       widows: 3;
-      page-break-inside: avoid;
-    }
-    
-    /* Grid layout optimization */
-    .grid {
-      display: block !important;
-    }
-    
-    .grid-cols-1,
-    .grid-cols-2,
-    .md\:grid-cols-2 {
-      display: block !important;
-    }
-    
-    /* Spacing optimization */
-    .space-y-3 > * + * {
-      margin-top: 0.5rem !important;
-    }
-    
-    .space-y-8 > * + * {
-      margin-top: 1rem !important;
-    }
-    
-    /* Compact spacing for print */
-    .px-4, .px-6, .px-8,
-    .py-4, .py-6, .py-8,
-    .sm\:px-6, .lg\:px-8 {
-      padding: 0.25rem !important;
-    }
-    
-    .mb-6, .mb-8 {
-      margin-bottom: 0.5rem !important;
-    }
-    
-    .mt-6, .mt-8 {
-      margin-top: 0.5rem !important;
-    }
-    
-    .pt-4, .pt-6 {
-      padding-top: 0.25rem !important;
-    }
-    
-    .pb-4, .pb-6 {
-      padding-bottom: 0.25rem !important;
-    }
-    
-    /* Text size optimization */
-    .text-sm {
-      font-size: 10px !important;
-      line-height: 1.3 !important;
-    }
-    
-    .text-xs {
-      font-size: 9px !important;
-      line-height: 1.2 !important;
-    }
-    
-    .text-base {
-      font-size: 11px !important;
-      line-height: 1.3 !important;
-    }
-    
-    .text-lg {
-      font-size: 12px !important;
-      line-height: 1.3 !important;
-    }
-    
-    /* Table cell padding */
-    td {
-      padding: 0.125rem 0.25rem !important;
-      vertical-align: top;
-    }
-    
-    /* Border optimization */
-    .border-t {
-      border-top: 1px solid #000 !important;
-    }
-    
-    .border-b {
-      border-bottom: 1px solid #000 !important;
-    }
-    
-    .border-t-2 {
-      border-top: 2px solid #000 !important;
-    }
-    
-    /* Table-like layout for customer info */
-    .customer-vehicle-info {
-      display: table;
-      width: 100%;
-      border-collapse: collapse;
-    }
-    
-    .customer-vehicle-info > div {
-      display: table-row;
-    }
-    
-    .customer-vehicle-info > div > div {
-      display: table-cell;
-      padding: 0.25rem 0.5rem;
-      border-bottom: 1px solid #e5e7eb;
-      vertical-align: top;
-    }
-    
-    /* Cost breakdown table */
-    .cost-breakdown {
-      border-top: 2px solid black;
-      margin-top: 1rem;
-      padding-top: 0.5rem;
-    }
-    
-    /* Final total emphasis */
-    .total-amount {
-      border-top: 2px solid black;
-      font-weight: bold;
-      font-size: 14px;
-    }
-    
-    /* Company header */
-    .company-header {
-      text-align: center;
-      border-bottom: 2px solid black;
-      padding-bottom: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    
-    /* Invoice number emphasis */
-    .invoice-number {
-      font-size: 16px;
-      font-weight: bold;
-      text-align: right;
-    }
-    
-    /* Service description box */
-    .service-description {
-      border: 1px solid black;
-      padding: 0.5rem;
-      margin: 0.5rem 0;
-      background: white !important;
-    }
-    
-    /* Footer */
-    .invoice-footer {
-      margin-top: 1rem;
-      padding-top: 0.5rem;
-      border-top: 1px solid black;
-      text-align: center;
-      font-size: 10px;
     }
   }
 </style>

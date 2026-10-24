@@ -1,304 +1,294 @@
 <script>
     import { onMount } from 'svelte';
-    import { fly } from 'svelte/transition';
 
     export let invoice = {};
     export let invoiceItems = [];
 
     function formatCurrency(amount) {
-        if (!amount) return 'Rp 0';
+        const value = Number(amount) || 0;
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
-        }).format(amount);
+        }).format(value);
     }
 
     function formatDate(timestamp) {
         if (!timestamp) return '-';
-        const date = new Date(timestamp);
-        return date.toLocaleDateString('id-ID', {
+        return new Date(timestamp).toLocaleDateString('id-ID', {
             day: '2-digit',
-            month: '2-digit',
+            month: 'long',
             year: 'numeric'
         });
     }
 
+    function getStatusText(status) {
+        const labels = {
+            draft: 'Draft',
+            sent: 'Terkirim',
+            paid: 'Lunas',
+            cancelled: 'Dibatalkan'
+        };
+        return labels[status] || status || '-';
+    }
+
     onMount(() => {
-        // Auto-trigger print dialog when page loads
-        window.print();
+        // Tunggu layout selesai sebelum membuka dialog cetak.
+        requestAnimationFrame(() => window.print());
     });
 </script>
 
 <svelte:head>
-    <title>Invoice {invoice?.invoice_number || ''} - PDF</title>
+    <title>Invoice {invoice?.invoice_number || ''} - SST Bengkel</title>
     <style>
-        @media print {
-            body { 
-                margin: 0; 
-                padding: 0;
-                font-family: 'Arial', sans-serif;
-            }
-            .no-print { display: none !important; }
-            
-            /* Ukuran nota 89x89mm */
-            @page {
-                size: 89mm 120mm; /* Sedikit lebih tinggi untuk konten */
-                margin: 2mm;
-            }
-            
-            .receipt-container {
-                width: 85mm;
-                font-size: 8px;
-                line-height: 1.2;
-                color: #000;
-            }
-            
-            .receipt-header {
-                text-align: center;
-                margin-bottom: 4mm;
-                border-bottom: 1px dashed #000;
-                padding-bottom: 2mm;
-            }
-            
-            .shop-name {
-                font-size: 12px;
-                font-weight: bold;
-                margin-bottom: 1mm;
-            }
-            
-            .shop-info {
-                font-size: 7px;
-                line-height: 1.1;
-            }
-            
-            .invoice-info {
-                margin: 3mm 0;
-                font-size: 8px;
-            }
-            
-            .customer-info {
-                margin: 3mm 0;
-                font-size: 8px;
-                border-bottom: 1px dashed #000;
-                padding-bottom: 2mm;
-            }
-            
-            .items-table {
-                width: 100%;
-                font-size: 7px;
-                margin: 2mm 0;
-            }
-            
-            .items-table td {
-                padding: 0.5mm 0;
-                vertical-align: top;
-            }
-            
-            .item-name {
-                font-weight: bold;
-            }
-            
-            .totals {
-                margin-top: 2mm;
-                padding-top: 2mm;
-                border-top: 1px dashed #000;
-                font-size: 8px;
-            }
-            
-            .total-row {
-                display: flex;
-                justify-content: space-between;
-                margin: 1mm 0;
-            }
-            
-            .grand-total {
-                font-weight: bold;
-                font-size: 10px;
-                border-top: 1px solid #000;
-                padding-top: 1mm;
-                margin-top: 2mm;
-            }
-            
-            .footer {
-                margin-top: 4mm;
-                text-align: center;
-                font-size: 7px;
-                border-top: 1px dashed #000;
-                padding-top: 2mm;
-            }
+        @page {
+            size: A4 portrait;
+            margin: 14mm;
         }
-        
+
+        html, body {
+            color-scheme: light;
+        }
+
+        #app {
+            background: #eef2f7 !important;
+        }
+
         @media screen {
             body {
-                background: #f5f5f5;
-                padding: 20px;
-                font-family: 'Arial', sans-serif;
+                margin: 0;
+                padding: 24px;
+                background: #eef2f7;
+                font-family: Arial, Helvetica, sans-serif;
+                color: #172033;
             }
-            
-            .receipt-container {
-                background: white;
-                max-width: 89mm;
+
+            .invoice-paper {
+                box-sizing: border-box;
+                width: min(210mm, 100%);
+                min-height: 297mm;
                 margin: 0 auto;
-                padding: 10px;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                border: 1px solid #ddd;
+                padding: 14mm;
+                background: #fff;
+                box-shadow: 0 8px 30px rgba(15, 23, 42, .12);
             }
+        }
+
+        @media print {
+            html, body, #app {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #fff !important;
+                color: #111827;
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 10pt;
+                line-height: 1.45;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            #app {
+                min-height: 0 !important;
+            }
+
+            .no-print { display: none !important; }
+
+            .invoice-paper {
+                width: auto !important;
+                min-height: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+            }
+        }
+
+        .invoice-paper {
+            color-scheme: light;
+            color: #172033;
+            background: #fff !important;
+        }
+        .toolbar { margin: 0 auto 18px; text-align: center; }
+        .toolbar button {
+            border: 0;
+            border-radius: 6px;
+            padding: 10px 18px;
+            color: #fff;
+            background: #15803d;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .toolbar button + button { margin-left: 8px; background: #475569; }
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
+            padding-bottom: 18px;
+            border-bottom: 2px solid #1f2937;
+        }
+        .shop-name { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+        .shop-contact { margin-top: 5px; color: #4b5563; font-size: 9pt; line-height: 1.5; }
+        .invoice-heading { text-align: right; }
+        .invoice-heading h2 { margin: 0 0 5px; color: #c2410c; font-size: 23px; letter-spacing: .08em; }
+        .invoice-heading strong { font-size: 12pt; }
+        .invoice-heading p { margin: 3px 0 0; color: #4b5563; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 20px 0; }
+        .info-card h3, .section-title { margin: 0 0 7px; font-size: 10pt; font-weight: 700; text-transform: uppercase; letter-spacing: .035em; }
+        .info-card p { margin: 2px 0; overflow-wrap: anywhere; }
+        .section { margin: 20px 0; }
+        .description {
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 10px 12px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        .items-table { table-layout: fixed; }
+        .items-table thead { display: table-header-group; }
+        .items-table th {
+            padding: 8px 7px;
+            border-top: 1px solid #475569;
+            border-bottom: 1px solid #475569;
+            background: #f1f5f9;
+            text-align: left;
+            font-size: 9pt;
+        }
+        .items-table td { padding: 8px 7px; border-bottom: 1px solid #dbe1e8; vertical-align: top; }
+        .items-table .number { width: 7%; }
+        .items-table .item-column { width: 43%; }
+        .items-table .qty-column { width: 10%; text-align: center; }
+        .items-table .price-column { width: 20%; text-align: right; }
+        .items-table .amount-column { width: 20%; text-align: right; }
+        .item-name { font-weight: 600; overflow-wrap: anywhere; }
+        .item-description { margin-top: 3px; color: #4b5563; white-space: pre-wrap; overflow-wrap: anywhere; }
+        .items-table tr { break-inside: avoid; page-break-inside: avoid; }
+        .totals-wrap { display: flex; justify-content: flex-end; margin-top: 16px; break-inside: avoid; page-break-inside: avoid; }
+        .totals { width: min(100%, 330px); }
+        .total-row { display: flex; justify-content: space-between; gap: 20px; padding: 5px 0; }
+        .grand-total { margin-top: 4px; padding-top: 9px; border-top: 2px solid #1f2937; font-size: 13pt; font-weight: 700; }
+        .payment-notes { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; margin-top: 22px; padding-top: 14px; border-top: 1px solid #cbd5e1; }
+        .payment-status { font-weight: 700; }
+        .notes { max-width: 55%; white-space: pre-wrap; overflow-wrap: anywhere; }
+        .notes h3 { margin: 0 0 5px; font-size: 10pt; }
+        .footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid #cbd5e1; text-align: center; color: #4b5563; font-size: 9pt; }
+
+        @media print {
+            .invoice-header, .info-grid, .totals-wrap, .payment-notes, .footer {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            .section-title { break-after: avoid; page-break-after: avoid; }
+            p { orphans: 3; widows: 3; }
         }
     </style>
 </svelte:head>
 
-<!-- Tombol untuk screen view -->
-<div class="no-print" style="text-align: center; margin-bottom: 20px;">
-    <button on:click={() => window.print()} style="background: #f59e0b; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-        Print Invoice
-    </button>
-    <button on:click={() => window.close()} style="background: #6b7280; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">
-        Tutup
-    </button>
+<div class="toolbar no-print">
+    <button on:click={() => window.print()}>Cetak A4</button>
+    <button on:click={() => window.close()}>Tutup</button>
 </div>
 
-<!-- Invoice Content -->
-<div class="receipt-container">
-    <!-- Header -->
-    <div class="receipt-header">
-        <div class="shop-name">SST BENGKEL</div>
-        <div class="shop-info">
-            Jl. Contoh No. 123, Jakarta<br>
-            Telp: (021) 1234-5678<br>
-            WhatsApp: 0812-3456-7890
+<main class="invoice-paper">
+    <header class="invoice-header">
+        <div>
+            <h1 class="shop-name">SST Bengkel</h1>
+            <div class="shop-contact">
+                Jl. Contoh No. 123, Jakarta<br />
+                Telp: (021) 1234-5678
+            </div>
         </div>
-    </div>
+        <div class="invoice-heading">
+            <h2>INVOICE</h2>
+            <strong>#{invoice.invoice_number || '-'}</strong>
+            <p>Tanggal: {formatDate(invoice.invoice_date)}</p>
+            {#if invoice.due_date}<p>Jatuh tempo: {formatDate(invoice.due_date)}</p>{/if}
+            {#if invoice.spk_number}<p>SPK: {invoice.spk_number}</p>{/if}
+        </div>
+    </header>
 
-    <!-- Invoice Info -->
-    <div class="invoice-info">
-        <div style="display: flex; justify-content: space-between;">
-            <span>No Invoice:</span>
-            <span><strong>{invoice.invoice_number}</strong></span>
+    <section class="info-grid">
+        <div class="info-card">
+            <h3>Tagihan kepada</h3>
+            <p><strong>{invoice.customer_name || '-'}</strong></p>
+            {#if invoice.customer_phone}<p>Telp: {invoice.customer_phone}</p>{/if}
+            {#if invoice.customer_address}<p>{invoice.customer_address}</p>{/if}
         </div>
-        <div style="display: flex; justify-content: space-between;">
-            <span>Tanggal:</span>
-            <span>{formatDate(invoice.invoice_date)}</span>
+        <div class="info-card">
+            <h3>Detail kendaraan</h3>
+            <p><strong>Plat nomor:</strong> {invoice.license_plate || '-'}</p>
+            <p><strong>Kendaraan:</strong> {[invoice.brand, invoice.model].filter(Boolean).join(' ') || '-'}</p>
         </div>
-        <div style="display: flex; justify-content: space-between;">
-            <span>SPK:</span>
-            <span>{invoice.spk_number}</span>
-        </div>
-    </div>
+    </section>
 
-    <!-- Customer Info -->
-    <div class="customer-info">
-        <div><strong>Pelanggan:</strong></div>
-        <div>{invoice.customer_name}</div>
-        {#if invoice.customer_phone}
-            <div>Telp: {invoice.customer_phone}</div>
-        {/if}
-        <div><strong>Kendaraan:</strong></div>
-        <div>{invoice.license_plate} - {invoice.brand} {invoice.model}</div>
-    </div>
+    {#if invoice.service_description}
+        <section class="section">
+            <h3 class="section-title">Deskripsi pekerjaan</h3>
+            <div class="description">{invoice.service_description}</div>
+        </section>
+    {/if}
 
-    <!-- Service Items -->
     {#if invoiceItems && invoiceItems.length > 0}
-        {@const serviceItems = invoiceItems.filter(item => item.type === 'service')}
-        {@const sparepartItems = invoiceItems.filter(item => item.type === 'part')}
-        
-        {#if serviceItems.length > 0}
-            <div style="margin: 3mm 0; font-size: 8px;">
-                <div><strong>Layanan:</strong></div>
-                <table class="items-table" style="margin-top: 1mm;">
-                    <tbody>
-                        {#each serviceItems as item}
-                            <tr>
-                                <td class="item-name">{item.item_name}</td>
-                                <td style="text-align: right; width: 20mm;">{formatCurrency(item.total_price)}</td>
-                            </tr>
-                        {/each}
-                    </tbody>
-                </table>
-            </div>
-        {/if}
-        
-        {#if sparepartItems.length > 0}
-            <div style="margin: 3mm 0; font-size: 8px;">
-                <div><strong>Sparepart:</strong></div>
-                <table class="items-table" style="margin-top: 1mm;">
-                    <tbody>
-                        {#each sparepartItems as item}
-                            <tr>
-                                <td class="item-name">
-                                    {item.item_name}
-                                    {#if item.quantity > 1}
-                                        <span style="font-size: 7px; color: #666;">({item.quantity}x)</span>
-                                    {/if}
-                                </td>
-                                <td style="text-align: right; width: 20mm;">{formatCurrency(item.total_price)}</td>
-                            </tr>
-                        {/each}
-                    </tbody>
-                </table>
-            </div>
-        {/if}
-    {:else if invoice.service_description}
-        <div style="margin: 3mm 0; font-size: 8px;">
-            <div><strong>Layanan:</strong></div>
-            <div>{invoice.service_description}</div>
-        </div>
+        <section class="section">
+            <h3 class="section-title">Rincian jasa dan sparepart</h3>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th class="number">No.</th>
+                        <th class="item-column">Uraian</th>
+                        <th class="qty-column">Qty</th>
+                        <th class="price-column">Harga satuan</th>
+                        <th class="amount-column">Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {#each invoiceItems as item, index}
+                        <tr>
+                            <td>{index + 1}</td>
+                            <td>
+                                <div class="item-name">{item.item_name || 'Item invoice'}</div>
+                                {#if item.description && item.description !== item.item_name}
+                                    <div class="item-description">{item.description}</div>
+                                {/if}
+                                <div class="item-description">{item.type === 'service' ? 'Jasa' : item.type === 'part' ? 'Sparepart' : item.type || ''}</div>
+                            </td>
+                            <td class="qty-column">{item.quantity || 0}</td>
+                            <td class="price-column">{formatCurrency(item.unit_price)}</td>
+                            <td class="amount-column">{formatCurrency(item.total_price)}</td>
+                        </tr>
+                    {/each}
+                </tbody>
+            </table>
+        </section>
     {/if}
 
-    <!-- Totals -->
-    <div class="totals">
-        <div class="total-row">
-            <span>Subtotal:</span>
-            <span>{formatCurrency(invoice.subtotal)}</span>
+    <section class="totals-wrap">
+        <div class="totals">
+            <div class="total-row"><span>Subtotal</span><span>{formatCurrency(invoice.subtotal)}</span></div>
+            {#if Number(invoice.tax_amount) > 0}
+                <div class="total-row"><span>Pajak</span><span>{formatCurrency(invoice.tax_amount)}</span></div>
+            {/if}
+            {#if Number(invoice.discount_amount) > 0}
+                <div class="total-row"><span>Diskon</span><span>-{formatCurrency(invoice.discount_amount)}</span></div>
+            {/if}
+            <div class="total-row grand-total"><span>TOTAL</span><span>{formatCurrency(invoice.total_amount)}</span></div>
         </div>
-        
-        {#if invoice.tax_amount > 0}
-            <div class="total-row">
-                <span>Pajak:</span>
-                <span>{formatCurrency(invoice.tax_amount)}</span>
+    </section>
+
+    <section class="payment-notes">
+        <div>
+            <div>Status pembayaran</div>
+            <div class="payment-status">{getStatusText(invoice.status)}</div>
+            {#if invoice.paid_date}<div>Dibayar pada: {formatDate(invoice.paid_date)}</div>{/if}
+        </div>
+        {#if invoice.notes}
+            <div class="notes">
+                <h3>Catatan</h3>
+                <div>{invoice.notes}</div>
             </div>
         {/if}
-        
-        {#if invoice.discount_amount > 0}
-            <div class="total-row">
-                <span>Diskon:</span>
-                <span>-{formatCurrency(invoice.discount_amount)}</span>
-            </div>
-        {/if}
-        
-        <div class="total-row grand-total">
-            <span>TOTAL:</span>
-            <span>{formatCurrency(invoice.total_amount)}</span>
-        </div>
-    </div>
+    </section>
 
-    <!-- Payment Status -->
-    <div style="margin: 3mm 0; text-align: center; font-size: 8px;">
-        <div style="background: #10b981; color: white; padding: 1mm; border-radius: 2px;">
-            <strong>✓ LUNAS</strong>
-        </div>
-        {#if invoice.paid_date}
-            <div style="margin-top: 1mm;">
-                Dibayar: {formatDate(invoice.paid_date)}
-            </div>
-        {/if}
-    </div>
-
-    <!-- Notes -->
-    {#if invoice.notes}
-        <div style="margin: 3mm 0; font-size: 7px;">
-            <div><strong>Catatan:</strong></div>
-            <div>{invoice.notes}</div>
-        </div>
-    {/if}
-
-    <!-- Footer -->
-    <div class="footer">
-        <div>Terima kasih atas kepercayaan Anda</div>
-        <div>Garansi sesuai ketentuan bengkel</div>
-        <div style="margin-top: 1mm;">
-            Jam operasional: 08:00 - 17:00 WIB
-        </div>
-    </div>
-</div>
+    <footer class="footer">Terima kasih atas kepercayaan Anda menggunakan layanan SST Bengkel.</footer>
+</main>
