@@ -1,7 +1,7 @@
 <script>
-  import { inertia, router } from '@inertiajs/svelte'
+  import { router } from '@inertiajs/svelte'
   import { fly, fade } from 'svelte/transition'
-  import SSTHeader from '../../Components/SSTHeader.svelte'
+
 
   export let invoices = []
   export let pagination = {}
@@ -82,11 +82,6 @@
   <title>Invoice Otomatis - SST Bengkel</title>
 </svelte:head>
 
-<!-- SST Header -->
-<div class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-['Inter']">
-  <SSTHeader showBackground={false} position="relative" />
-</div>
-
 <div class="min-h-screen bg-gray-50">
   <!-- Page Header -->
   <div class="bg-white shadow">
@@ -98,7 +93,6 @@
         </div>
         <a
           href="/invoices/create"
-          use:inertia
           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,89 +177,9 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
     <div class="bg-white shadow overflow-hidden sm:rounded-md">
       {#if invoices.length > 0}
-        <ul class="divide-y divide-gray-200">
-          {#each invoices as invoice, i}
-            <li transition:fly={{ y: 20, duration: 300, delay: i * 50 }}>
-              <div class="px-4 py-4 sm:px-6 hover:bg-gray-50">
-                <div class="flex items-center justify-between">
-                  <div class="flex-1">
-                    <div class="flex items-center justify-between">
-                      <p class="text-lg font-semibold text-orange-600 truncate">
-                        {invoice.invoice_number}
-                      </p>
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {getStatusBadge(invoice.status)}">
-                        {getStatusText(invoice.status)}
-                      </span>
-                    </div>
-                    <div class="mt-2 sm:flex sm:justify-between">
-                      <div class="sm:flex">
-                        <p class="flex items-center text-sm text-gray-500">
-                          <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                          </svg>
-                          SPK: {invoice.spk_number}
-                        </p>
-                        <p class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
-                          <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                          </svg>
-                          {invoice.license_plate}
-                        </p>
-                        <p class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
-                          <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                          </svg>
-                          {invoice.customer_name}
-                        </p>
-                      </div>
-                      <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                        <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 4v10m6-10v10m-6-4h6"></path>
-                        </svg>
-                        {formatDate(invoice.invoice_date)}
-                      </div>
-                    </div>
-                    <div class="mt-2 flex items-center justify-between">
-                      <div class="text-lg font-bold text-gray-900">
-                        {formatCurrency(invoice.total_amount)}
-                      </div>
-                      {#if invoice.paid_date}
-                        <div class="text-sm text-green-600">
-                          Dibayar: {formatDate(invoice.paid_date)}
-                        </div>
-                      {/if}
-                    </div>
-                  </div>
-                  <div class="ml-4 flex-shrink-0 flex space-x-2">
-                    <a
-                      href="/invoices/{invoice.id}"
-                      use:inertia
-                      class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
-                    >
-                      Lihat
-                    </a>
-                    <button
-                      on:click={() => handlePrintPdf(invoice.id)}
-                      class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                    >
-                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                      </svg>
-                      Cetak A4
-                    </button>
-                    <a
-                      href="/invoices/{invoice.id}/edit"
-                      use:inertia
-                      class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
-                    >
-                      Edit
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </li>
-          {/each}
-        </ul>
+        <div class="management-table-scroll"><table class="management-table"><thead><tr><th>Invoice</th><th>Pelanggan / Kendaraan</th><th>Status</th><th class="money">Total tagihan</th><th><span class="sr-only">Tindakan</span></th></tr></thead><tbody>
+{#each invoices as invoice (invoice.id)}<tr><td><a class="primary-text" href="/invoices/{invoice.id}">{invoice.invoice_number}</a><div class="secondary-text">{formatDate(invoice.invoice_date)}</div></td><td><div>{invoice.customer_name || '—'}</div><div class="secondary-text">{invoice.license_plate || '—'} · {invoice.spk_number || '—'}</div></td><td><span class="inline-flex px-2 py-1 rounded text-xs font-medium {getStatusBadge(invoice.status)}">{getStatusText(invoice.status)}</span></td><td class="money"><strong>{formatCurrency(invoice.total_amount)}</strong>{#if invoice.paid_date}<div class="secondary-text">Dibayar {formatDate(invoice.paid_date)}</div>{/if}</td><td><div class="table-actions"><a class="action-link" href="/invoices/{invoice.id}">Lihat</a><button class="action-link" on:click={() => handlePrintPdf(invoice.id)}>Cetak A4</button><a class="action-link" href="/invoices/{invoice.id}/edit">Edit</a></div></td></tr>{/each}
+</tbody></table></div>
       {:else}
         <div class="text-center py-12">
           <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -276,7 +190,6 @@
           <div class="mt-6">
             <a
               href="/invoices/create"
-              use:inertia
               class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
             >
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -294,12 +207,12 @@
       <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4 rounded-lg shadow">
         <div class="flex-1 flex justify-between sm:hidden">
           {#if pagination.current_page > 1}
-            <a href="?page={pagination.current_page - 1}&search={search}&status={status}" use:inertia class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            <a href="?page={pagination.current_page - 1}&search={search}&status={status}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
               Previous
             </a>
           {/if}
           {#if pagination.current_page < pagination.total_pages}
-            <a href="?page={pagination.current_page + 1}&search={search}&status={status}" use:inertia class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            <a href="?page={pagination.current_page + 1}&search={search}&status={status}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
               Next
             </a>
           {/if}
@@ -315,7 +228,7 @@
           <div>
             <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
               {#if pagination.current_page > 1}
-                <a href="?page={pagination.current_page - 1}&search={search}&status={status}" use:inertia class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                <a href="?page={pagination.current_page - 1}&search={search}&status={status}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                   <span class="sr-only">Previous</span>
                   <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -329,14 +242,14 @@
                     {i + 1}
                   </span>
                 {:else}
-                  <a href="?page={i + 1}&search={search}&status={status}" use:inertia class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                  <a href="?page={i + 1}&search={search}&status={status}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
                     {i + 1}
                   </a>
                 {/if}
               {/each}
 
               {#if pagination.current_page < pagination.total_pages}
-                <a href="?page={pagination.current_page + 1}&search={search}&status={status}" use:inertia class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                <a href="?page={pagination.current_page + 1}&search={search}&status={status}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                   <span class="sr-only">Next</span>
                   <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />

@@ -1,15 +1,10 @@
 <script>
-  import { inertia } from '@inertiajs/svelte'
   import { fly, fade } from 'svelte/transition'
-  import SSTHeader from '../../Components/SSTHeader.svelte'
+
   
   export let stats = {}
   export let recentActivities = []
-  export let revenueData = []
   export let serviceStats = []
-  export let period = 'month'
-  export let year = new Date().getFullYear()
-  export let month = new Date().getMonth() + 1
   
   function formatCurrency(amount) {
     if (!amount) return 'Rp 0'
@@ -53,11 +48,6 @@
   <title>Laporan Real-time - SST Bengkel</title>
 </svelte:head>
 
-<!-- SST Header -->
-<div class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-['Inter']">
-  <SSTHeader showBackground={false} position="relative" />
-</div>
-
 <div class="min-h-screen bg-gray-50">
   <!-- Page Header -->
   <div class="bg-white shadow">
@@ -70,21 +60,18 @@
         <div class="flex space-x-3">
           <a
             href="/reports/revenue"
-            use:inertia
             class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Laporan Pendapatan
           </a>
           <a
             href="/reports/services"
-            use:inertia
             class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Laporan Servis
           </a>
           <a
             href="/reports/customers"
-            use:inertia
             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Laporan Pelanggan
@@ -285,7 +272,6 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <a
             href="/customers/create"
-            use:inertia
             class="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg border border-gray-300 hover:border-blue-500 transition-colors"
           >
             <div>
@@ -308,7 +294,6 @@
 
           <a
             href="/vehicles/create"
-            use:inertia
             class="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-500 rounded-lg border border-gray-300 hover:border-green-500 transition-colors"
           >
             <div>
@@ -331,7 +316,6 @@
 
           <a
             href="/spk/create"
-            use:inertia
             class="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-purple-500 rounded-lg border border-gray-300 hover:border-purple-500 transition-colors"
           >
             <div>
@@ -354,7 +338,6 @@
 
           <a
             href="/invoices/create"
-            use:inertia
             class="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-orange-500 rounded-lg border border-gray-300 hover:border-orange-500 transition-colors"
           >
             <div>

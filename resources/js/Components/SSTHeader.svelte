@@ -150,7 +150,8 @@
         Kendaraan
         <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-green-600 transition-all duration-300 group-hover:w-full"></span>
       </a>
-      <a href="/spk" use:inertia class="text-gray-700 hover:text-purple-600 transition-all duration-300 font-medium text-lg relative group">
+      <!-- Load SPK as a document: the legacy Inertia adapter can update the outgoing page with SPK-only props. -->
+      <a href="/spk" class="text-gray-700 hover:text-purple-600 transition-all duration-300 font-medium text-lg relative group">
         SPK Digital
         <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-600 transition-all duration-300 group-hover:w-full"></span>
       </a>
@@ -216,7 +217,7 @@
             </div>
           </a>
 
-          <a href="/spk" use:inertia on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
+          <a href="/spk" on:click={closeMobileMenu} class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200">
             <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
               <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>

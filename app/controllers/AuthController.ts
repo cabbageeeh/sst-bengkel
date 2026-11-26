@@ -111,6 +111,7 @@ class AuthController {
             .update({
                password: await Authenticate.hash(data.new_password),
             });
+         return response.json({ message: 'Password berhasil diperbarui' });
       } else {
          return response
             .status(400)

@@ -1,0 +1,20 @@
+Create a polished high-fidelity desktop web app UI mockup for SST Bengkel, redesigned for Indonesian workshop owners and front-desk staff who are unfamiliar with software. ONE simple, self-explanatory screen, a flat front-on app screenshot, landscape 1536x1024 approximately. Mature production-quality spacing and typography, generous whitespace, readable 16px equivalent text, strong contrast, clean white/light gray surface, navy text, red primary action. No marketing decoration, no charts, no metric cards, no sidebar detail panel, no jargon, no technical IDs, no ellipsis menus, no icon-only controls. Each action is obvious from words. Use Indonesian exactly and realistic fictitious workshop data.
+
+Replace the complex sidebar/table/detail structure with an extremely simple navigation and one work list.
+
+TOP HEADER white with bottom thin gray divider, compact red car/wrench icon and "SST Bengkel" at left, tiny "Specialist Suzuki Technology" below brand. Horizontal navigation with only three clearly separated destinations: "Servis kendaraan" active navy text with red underline, "Pelanggan", "Laporan". Right shows circular AD avatar and "Admin". No notification icon or decorative badges.
+
+MAIN max-width about 1200px, centered with ample 60–90px side margins. Heading large 30px "Servis kendaraan". Supporting sentence "Lihat kendaraan yang masuk dan perkembangan servisnya." At right one unmistakable red button "+ Tambah servis" with white bold text. No export button, no filters button.
+Next full-width roomy search field with magnifying icon and placeholder "Cari nomor polisi atau nama pelanggan". Below search a plain labeled segmented switch with three choices: "Semua", "Belum dikerjakan", "Sedang diservis", "Sudah selesai". Active choice "Semua" in solid navy with white text, others white with gray border. No numerical counts cluttering switches.
+
+One single clean white list card, gently rounded 10px, thin gray border. Table header "Kendaraan", "Pelanggan", "Status servis", "Perkiraan biaya", final action column without a heading. FIVE spacious rows about 94px tall, with thin row dividers. Plate is the most prominent semibold text, model secondary gray text below, customer clearly readable. No photographs or colored avatar initials for customers. Status written explicitly in soft tinted pills with optional small dot and sufficient contrast, never color alone.
+Row1: bold plate "B 1842 SJK", small "Suzuki Ertiga"; customer "Andi Pratama"; status "Sedang diservis" in soft blue; cost "Rp 1.250.000"; outline navy button "Lihat servis →".
+Row2: "B 2310 KZA", "Suzuki Swift"; "Rina Wulandari"; status "Belum dikerjakan" in light amber; cost "Rp 850.000"; button "Lihat servis →".
+Row3: "B 9081 FRT", "Suzuki XL7"; "Budi Santoso"; status "Sedang diservis" blue; cost "Rp 675.000"; button "Lihat servis →".
+Row4: "B 1478 TKS", "Suzuki Baleno"; "Dedi Setiawan"; status "Sudah selesai" green with small check; cost "Rp 1.100.000"; button "Lihat servis →".
+Row5: "B 3205 PNR", "Suzuki Ignis"; "Maya Putri"; status "Belum dikerjakan" amber; cost "Belum diisi" in muted gray; button "Lihat servis →".
+Under card a discreet explanatory sentence aligned left: "Perkiraan biaya dapat berubah setelah pemeriksaan kendaraan."
+Pagination footer simple left "Menampilkan 5 dari 24 kendaraan", right two clearly labeled outline buttons "← Sebelumnya" (disabled pale gray) and "Berikutnya →" navy outline. No tiny numbered pagination.
+At bottom airy quiet footer small "SST Bengkel" left, "Pratinjau desain · data contoh" right.
+
+This is intentionally a smaller, simpler interface requiring no explanation. Make it feel credible and highly polished through alignment, typography, proportions and restraint. No extra SPK numbers, no completion percentages, no account settings block, no reminders, no fiscal charts, no duplicate buttons. Never include official Suzuki S emblem. Use exact labels, no extra invented features or random text. Entire interface fits within canvas with generous padding.

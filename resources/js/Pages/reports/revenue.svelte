@@ -1,7 +1,7 @@
 <script>
-  import { inertia, router } from '@inertiajs/svelte'
+  import { router } from '@inertiajs/svelte'
   import { fly, fade } from 'svelte/transition'
-  import SSTHeader from '../../Components/SSTHeader.svelte'
+
 
   export let revenueData = []
   export let startDate = ''
@@ -74,7 +74,7 @@
   $: maxAmount = Math.max(...revenueData.map(item => item.total_amount || 0))
 </script>
 
-<SSTHeader showBackground={true} />
+
 
 <div class="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 pt-20">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

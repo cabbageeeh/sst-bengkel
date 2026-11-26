@@ -1,6 +1,5 @@
 <script>
-	import { inertia } from '@inertiajs/svelte';
-	import SSTHeader from '../../Components/SSTHeader.svelte';
+
 
 	// Props
 	export let customerData = [];
@@ -99,12 +98,12 @@
 	}
 
 	function getSortIcon(column) {
-		if (sortBy !== column) return '↕️';
+		if (sortBy !== column) return '↕';
 		return sortOrder === 'asc' ? '↑' : '↓';
 	}
 </script>
 
-<SSTHeader showBackground={true} position="sticky" />
+
 
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-20">
 	<div class="container mx-auto px-4 py-8">
@@ -192,28 +191,28 @@
 			<h3 class="text-lg font-semibold text-gray-800 mb-4">Filter & Pencarian</h3>
 			<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-2">Cari Pelanggan</label>
+					<label for="report-customer-search" class="block text-sm font-medium text-gray-700 mb-2">Cari Pelanggan</label>
 					<input
 						type="text"
-						bind:value={searchTerm}
+						id="report-customer-search" bind:value={searchTerm}
 						placeholder="Nama, email, atau telepon..."
 						class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 					/>
 				</div>
 				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-2">Pengeluaran Minimum</label>
+					<label for="report-min-spent" class="block text-sm font-medium text-gray-700 mb-2">Pengeluaran Minimum</label>
 					<input
 						type="number"
-						bind:value={minSpent}
+						id="report-min-spent" bind:value={minSpent}
 						placeholder="0"
 						class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 					/>
 				</div>
 				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-2">Pengeluaran Maksimum</label>
+					<label for="report-max-spent" class="block text-sm font-medium text-gray-700 mb-2">Pengeluaran Maksimum</label>
 					<input
 						type="number"
-						bind:value={maxSpent}
+						id="report-max-spent" bind:value={maxSpent}
 						placeholder="Tidak terbatas"
 						class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 					/>

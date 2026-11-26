@@ -1,5 +1,7 @@
 <script>
     import { onMount } from 'svelte';
+    import { printWhenReady } from '../../Components/printWhenReady.js';
+    import BrandLogo from '../../Components/BrandLogo.svelte';
     
     export let spk;
     export let spkItems = [];
@@ -41,10 +43,7 @@
         totalItems = spkItems.reduce((sum, item) => sum + (item.total_price || 0), 0);
     }
     
-    onMount(() => {
-        // Auto print when page loads
-        window.print();
-    });
+    onMount(printWhenReady);
 </script>
 
 <svelte:head>
@@ -73,10 +72,9 @@
         <!-- Header -->
         <div class="header">
             <div class="company-info">
-                <h1>SST DANI MOTOR</h1>
-                <p>Jl. Raya Bengkel No. 123</p>
-                <p>Telp: (021) 123-4567</p>
-                <p>Email: info@sstdanimotor.com</p>
+                <BrandLogo width={180} />
+                <p>Specialist Suzuki Technology</p>
+                <p>Telp: 081235295993</p>
             </div>
             <div class="document-title">
                 <h2>SURAT PERINTAH KERJA</h2>
@@ -263,13 +261,6 @@
         border-bottom: 2px solid #333;
         padding-bottom: 15px;
         margin-bottom: 20px;
-    }
-
-    .company-info h1 {
-        margin: 0;
-        font-size: 18px;
-        font-weight: bold;
-        color: #333;
     }
 
     .company-info p {

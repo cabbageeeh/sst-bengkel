@@ -1,8 +1,8 @@
 <script>
-    import { inertia, router } from "@inertiajs/svelte";
-    import LajuIcon from "../../Components/LajuIcon.svelte";
+    import { router } from "@inertiajs/svelte";
+    import BrandLogo from '../../Components/BrandLogo.svelte';
     import axios from "axios";
-    import SSTHeader from '../../Components/SSTHeader.svelte';
+
 
     let form = {
         email: "",
@@ -21,11 +21,6 @@
     }
 </script>
 
-<!-- SST Header -->
-<div class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-['Inter']">
-  <SSTHeader showBackground={false} position="relative" />
-</div>
-
 <section class="bg-gray-50 dark:bg-gray-900">
     <div
         class="flex flex-col items-center justify-center px-6 py-8 mx-auto min-h-screen lg:py-0"
@@ -33,7 +28,7 @@
         <div
             class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white"
         >
-            <LajuIcon></LajuIcon>
+            <BrandLogo width={190} />
         </div>
         <div
             class="w-full bg-white rounded-lg shadow dark:bg-gray-800 dark:border dark:border-gray-700 md:mt-0 sm:max-w-md xl:p-0"
@@ -95,7 +90,6 @@
                     <p class="text-sm font-light text-gray-500 dark:text-gray-400">
                         Ingat password Anda? <a
                             href="/login"
-                            use:inertia
                             class="font-medium text-emerald-600 hover:underline dark:text-emerald-400"
                             >Login disini</a
                         >

@@ -1,7 +1,7 @@
 <script>
-  import { inertia, router } from '@inertiajs/svelte'
+  import { router } from '@inertiajs/svelte'
   import { fly, fade } from 'svelte/transition'
-  import SSTHeader from '../../Components/SSTHeader.svelte'
+
 
   export let spk = {}
   export let spkItems = []
@@ -69,11 +69,6 @@
   <title>SPK {spk.spk_number} - SST Bengkel</title>
 </svelte:head>
 
-<!-- SST Header -->
-<div class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-['Inter']">
-  <SSTHeader showBackground={false} position="relative" />
-</div>
-
 <div class="min-h-screen bg-gray-50">
   <!-- Page Header -->
   <div class="bg-white shadow">
@@ -83,7 +78,7 @@
           <nav class="flex" aria-label="Breadcrumb">
             <ol class="flex items-center space-x-4">
               <li>
-                <a href="/spk" use:inertia class="text-gray-400 hover:text-gray-500">
+                <a href="/spk" class="text-gray-400 hover:text-gray-500">
                   SPK Digital
                 </a>
               </li>
@@ -118,7 +113,6 @@
           </a>
           <a
             href="/spk/{spk.id}/edit"
-            use:inertia
             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
           >
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

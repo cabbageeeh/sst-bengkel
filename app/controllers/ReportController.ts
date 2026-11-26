@@ -53,7 +53,7 @@ class Controller {
             let query = DB.from("invoices")
                 .select(
                     DB.raw("DATE(datetime(invoice_date/1000, 'unixepoch')) as date"),
-                    DB.raw("SUM(total_amount) as total_revenue"),
+                    DB.raw("SUM(total_amount) as total_amount"),
                     DB.raw("COUNT(*) as invoice_count")
                 )
                 .where("status", "paid");
@@ -123,7 +123,7 @@ class Controller {
                 .groupBy("status");
 
             return response.inertia("reports/services", {
-                services,
+                serviceData: services,
                 serviceStats,
                 startDate,
                 endDate,
@@ -159,7 +159,7 @@ class Controller {
                 .orderBy(sortBy, order);
 
             return response.inertia("reports/customers", {
-                customerStats,
+                customerData: customerStats,
                 sortBy,
                 order
             });

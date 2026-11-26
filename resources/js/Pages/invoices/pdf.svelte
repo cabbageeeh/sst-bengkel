@@ -1,8 +1,13 @@
 <script>
     import { onMount } from 'svelte';
+    import { printWhenReady } from '../../Components/printWhenReady.js';
+    import BrandLogo from '../../Components/BrandLogo.svelte';
 
     export let invoice = {};
     export let invoiceItems = [];
+
+    $: serviceTotal = invoiceItems.filter(item => item.type === 'service').reduce((sum, item) => sum + (Number(item.total_price) || 0), 0);
+    $: partTotal = invoiceItems.filter(item => item.type === 'part').reduce((sum, item) => sum + (Number(item.total_price) || 0), 0);
 
     function formatCurrency(amount) {
         const value = Number(amount) || 0;
@@ -33,10 +38,7 @@
         return labels[status] || status || '-';
     }
 
-    onMount(() => {
-        // Tunggu layout selesai sebelum membuka dialog cetak.
-        requestAnimationFrame(() => window.print());
-    });
+    onMount(printWhenReady);
 </script>
 
 <svelte:head>
@@ -164,6 +166,11 @@
         .item-name { font-weight: 600; overflow-wrap: anywhere; }
         .item-description { margin-top: 3px; color: #4b5563; white-space: pre-wrap; overflow-wrap: anywhere; }
         .items-table tr { break-inside: avoid; page-break-inside: avoid; }
+        .items-table tr.long-item { break-inside: auto; page-break-inside: auto; }
+        .items-table td { overflow-wrap: anywhere; }
+        .invoice-header > div, .info-card { min-width: 0; }
+        .invoice-heading { overflow-wrap: anywhere; }
+        .total-row > span:last-child { text-align: right; overflow-wrap: anywhere; }
         .totals-wrap { display: flex; justify-content: flex-end; margin-top: 16px; break-inside: avoid; page-break-inside: avoid; }
         .totals { width: min(100%, 330px); }
         .total-row { display: flex; justify-content: space-between; gap: 20px; padding: 5px 0; }
@@ -175,7 +182,7 @@
         .footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid #cbd5e1; text-align: center; color: #4b5563; font-size: 9pt; }
 
         @media print {
-            .invoice-header, .info-grid, .totals-wrap, .payment-notes, .footer {
+            .invoice-header, .info-grid, .totals-wrap, .footer {
                 break-inside: avoid;
                 page-break-inside: avoid;
             }
@@ -193,10 +200,10 @@
 <main class="invoice-paper">
     <header class="invoice-header">
         <div>
-            <h1 class="shop-name">SST Bengkel</h1>
+            <BrandLogo width={180} />
             <div class="shop-contact">
-                Jl. Contoh No. 123, Jakarta<br />
-                Telp: (021) 1234-5678
+                Specialist Suzuki Technology<br />
+                Telp: 081235295993
             </div>
         </div>
         <div class="invoice-heading">
@@ -244,7 +251,7 @@
                 </thead>
                 <tbody>
                     {#each invoiceItems as item, index}
-                        <tr>
+                        <tr class:long-item={(item.description || '').length > 1200 || (item.description || '').split('\n').length > 25}>
                             <td>{index + 1}</td>
                             <td>
                                 <div class="item-name">{item.item_name || 'Item invoice'}</div>
@@ -265,6 +272,8 @@
 
     <section class="totals-wrap">
         <div class="totals">
+            <div class="total-row"><span>Total jasa</span><span>{formatCurrency(serviceTotal)}</span></div>
+            <div class="total-row"><span>Total sparepart</span><span>{formatCurrency(partTotal)}</span></div>
             <div class="total-row"><span>Subtotal</span><span>{formatCurrency(invoice.subtotal)}</span></div>
             {#if Number(invoice.tax_amount) > 0}
                 <div class="total-row"><span>Pajak</span><span>{formatCurrency(invoice.tax_amount)}</span></div>

@@ -1,7 +1,7 @@
 <script>
-  import { inertia, router } from '@inertiajs/svelte'
+  import { router } from '@inertiajs/svelte'
   import { fly } from 'svelte/transition'
-  import SSTHeader from '../../Components/SSTHeader.svelte'
+
 
   export let vehicles = []
   export let selectedVehicle = null
@@ -121,11 +121,6 @@
   <title>Buat SPK Baru - SST Bengkel</title>
 </svelte:head>
 
-<!-- SST Header -->
-<div class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-['Inter']">
-  <SSTHeader showBackground={false} position="relative" />
-</div>
-
 <div class="min-h-screen bg-gray-50">
   <!-- Page Header -->
   <div class="bg-white shadow">
@@ -135,7 +130,7 @@
           <nav class="flex" aria-label="Breadcrumb">
             <ol class="flex items-center space-x-4">
               <li>
-                <a href="/spk" use:inertia class="text-gray-400 hover:text-gray-500">
+                <a href="/spk" class="text-gray-400 hover:text-gray-500">
                   SPK Digital
                 </a>
               </li>
@@ -386,7 +381,6 @@
         <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
           <a
             href="/spk"
-            use:inertia
             class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
           >
             Batal

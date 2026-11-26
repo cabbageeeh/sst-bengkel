@@ -1,7 +1,7 @@
 <script>
-  import { inertia, router } from '@inertiajs/svelte'
+  import { router } from '@inertiajs/svelte'
   import { fly, fade } from 'svelte/transition'
-  import SSTHeader from '../../Components/SSTHeader.svelte'
+
   import { Toast } from '../../Components/helper.js'
 
   export let vehicles = []
@@ -84,11 +84,6 @@
   <title>Manajemen Kendaraan - SST Bengkel</title>
 </svelte:head>
 
-<!-- SST Header -->
-<div class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-['Inter']">
-  <SSTHeader showBackground={false} position="relative" />
-</div>
-
 <div class="min-h-screen bg-gray-50">
   <!-- Page Header -->
   <div class="bg-white shadow">
@@ -100,7 +95,6 @@
         </div>
         <a
           href="/vehicles/create"
-          use:inertia
           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -127,7 +121,7 @@
           </div>
           <div class="ml-auto pl-3">
             <button
-              on:click={() => showSuccess = false}
+              aria-label="Tutup pesan" on:click={() => showSuccess = false}
               class="inline-flex text-green-400 hover:text-green-600"
             >
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -184,77 +178,9 @@
     <!-- Vehicle Table -->
     <div class="bg-white shadow overflow-hidden sm:rounded-md">
       {#if vehicles.length > 0}
-        <ul class="divide-y divide-gray-200">
-          {#each vehicles as vehicle, index (vehicle.id)}
-            <li transition:fly={{ y: 20, duration: 300, delay: index * 50 }}>
-              <div class="px-4 py-4 sm:px-6 hover:bg-gray-50">
-                <div class="flex items-center justify-between">
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center">
-                      <div class="flex-shrink-0">
-                        <div class="h-12 w-12 rounded-lg bg-blue-500 flex items-center justify-center">
-                          <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </div>
-                      </div>
-                      <div class="ml-4 flex-1 min-w-0">
-                        <div class="flex items-center">
-                          <p class="text-lg font-bold text-gray-900">
-                            {vehicle.license_plate}
-                          </p>
-                          <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {vehicle.year || 'N/A'}
-                          </span>
-                        </div>
-                        <p class="text-sm font-medium text-gray-700">
-                          {vehicle.brand} {vehicle.model}
-                        </p>
-                        <div class="mt-1 flex items-center text-sm text-gray-500">
-                          <span class="mr-4">👤 {vehicle.customer_name}</span>
-                          {#if vehicle.customer_phone}
-                            <span class="mr-4">📞 {vehicle.customer_phone}</span>
-                          {/if}
-                          {#if vehicle.color}
-                            <span class="mr-4">🎨 {vehicle.color}</span>
-                          {/if}
-                          {#if vehicle.engine_type}
-                            <span>⚙️ {vehicle.engine_type}</span>
-                          {/if}
-                        </div>
-                        <p class="mt-1 text-xs text-gray-400">
-                          Terdaftar: {formatDate(vehicle.created_at)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="flex items-center space-x-2">
-                    <a
-                      href="/vehicles/{vehicle.id}"
-                      use:inertia
-                      class="inline-flex items-center px-3 py-1 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                      Lihat
-                    </a>
-                    <a
-                      href="/vehicles/{vehicle.id}/edit"
-                      use:inertia
-                      class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                      Edit
-                    </a>
-                    <button
-                      on:click={() => deleteVehicle(vehicle.id, vehicle.license_plate)}
-                      class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                    >
-                      Hapus
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </li>
-          {/each}
-        </ul>
+        <div class="management-table-scroll"><table class="management-table"><thead><tr><th>Kendaraan</th><th>Pelanggan</th><th>Spesifikasi</th><th>Terdaftar</th><th><span class="sr-only">Tindakan</span></th></tr></thead><tbody>
+{#each vehicles as vehicle (vehicle.id)}<tr><td><a class="primary-text" href="/vehicles/{vehicle.id}">{vehicle.license_plate}</a><div class="secondary-text">{vehicle.brand} {vehicle.model}{vehicle.year ? ' · ' + vehicle.year : ''}</div></td><td><div>{vehicle.customer_name || '—'}</div><div class="secondary-text">{vehicle.customer_phone || 'Telepon belum diisi'}</div></td><td><div class="secondary-text">{vehicle.color || 'Warna belum diisi'}</div><div class="secondary-text">{vehicle.engine_type || 'Mesin belum diisi'}</div></td><td><span class="secondary-text">{formatDate(vehicle.created_at)}</span></td><td><div class="table-actions"><a class="action-link" href="/vehicles/{vehicle.id}">Lihat</a><a class="action-link" href="/vehicles/{vehicle.id}/edit">Edit</a><button class="action-link action-delete" on:click={() => deleteVehicle(vehicle.id, vehicle.license_plate)}>Hapus</button></div></td></tr>{/each}
+</tbody></table></div>
       {:else}
         <div class="text-center py-12">
           <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -265,7 +191,6 @@
           <div class="mt-6">
             <a
               href="/vehicles/create"
-              use:inertia
               class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -285,7 +210,6 @@
           {#if pagination.current_page > 1}
             <a
               href="?page={pagination.current_page - 1}{search ? '&search=' + encodeURIComponent(search) : ''}{customer_id ? '&customer_id=' + customer_id : ''}"
-              use:inertia
               class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
             >
               Previous
@@ -294,7 +218,6 @@
           {#if pagination.current_page < pagination.total_pages}
             <a
               href="?page={pagination.current_page + 1}{search ? '&search=' + encodeURIComponent(search) : ''}{customer_id ? '&customer_id=' + customer_id : ''}"
-              use:inertia
               class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
             >
               Next
@@ -318,7 +241,6 @@
               {#if pagination.current_page > 1}
                 <a
                   href="?page={pagination.current_page - 1}{search ? '&search=' + encodeURIComponent(search) : ''}{customer_id ? '&customer_id=' + customer_id : ''}"
-                  use:inertia
                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
                 >
                   <span class="sr-only">Previous</span>
@@ -336,7 +258,6 @@
                 {:else}
                   <a
                     href="?page={i + 1}{search ? '&search=' + encodeURIComponent(search) : ''}{customer_id ? '&customer_id=' + customer_id : ''}"
-                    use:inertia
                     class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
                   >
                     {i + 1}
@@ -347,7 +268,6 @@
               {#if pagination.current_page < pagination.total_pages}
                 <a
                   href="?page={pagination.current_page + 1}{search ? '&search=' + encodeURIComponent(search) : ''}{customer_id ? '&customer_id=' + customer_id : ''}"
-                  use:inertia
                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
                 >
                   <span class="sr-only">Next</span>

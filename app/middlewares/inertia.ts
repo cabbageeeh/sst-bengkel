@@ -5,6 +5,15 @@ let pkg = {version : "1.0.0"};
 
 const inertia = () => {
    return (req, res, next) => {
+      // Use Inertia's location response for controller redirects. This avoids
+      // cross-component prop swaps in the legacy Svelte adapter after a form POST.
+      const redirect = res.redirect.bind(res);
+      res.redirect = (url: string) => {
+         if (req.header('X-Inertia')) {
+            return res.status(409).header('X-Inertia-Location', url).send('');
+         }
+         return redirect(url);
+      };
       res.inertia = async (component, inertiaProps = {}, viewProps = {}) => {
          
          const url = `//${req.get("host")}${req.originalUrl}`;

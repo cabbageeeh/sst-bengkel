@@ -1,7 +1,7 @@
 <script>
-  import { inertia, router } from '@inertiajs/svelte'
+  import { router } from '@inertiajs/svelte'
   import { fly, fade } from 'svelte/transition'
-  import SSTHeader from '../../Components/SSTHeader.svelte'
+
   import { Toast } from '../../Components/helper.js'
 
   export let customers = []
@@ -79,11 +79,6 @@
   <title>Manajemen Pelanggan - SST Bengkel</title>
 </svelte:head>
 
-<!-- SST Header -->
-<div class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-['Inter']">
-  <SSTHeader showBackground={false} position="relative" />
-</div>
-
 <div class="min-h-screen bg-gray-50">
   <!-- Page Header -->
   <div class="bg-white shadow">
@@ -95,7 +90,6 @@
         </div>
         <a
           href="/customers/create"
-          use:inertia
           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,7 +116,7 @@
           </div>
           <div class="ml-auto pl-3">
             <button
-              on:click={() => showSuccess = false}
+              aria-label="Tutup pesan" on:click={() => showSuccess = false}
               class="inline-flex text-green-400 hover:text-green-600"
             >
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -162,81 +156,9 @@
     <!-- Customer Table -->
     <div class="bg-white shadow overflow-hidden sm:rounded-md">
       {#if customers.length > 0}
-        <ul class="divide-y divide-gray-200">
-          {#each customers as customer, index (customer.id)}
-            <li transition:fly={{ y: 20, duration: 300, delay: index * 50 }}>
-              <div class="px-4 py-4 sm:px-6 hover:bg-gray-50">
-                <div class="flex items-center justify-between">
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center">
-                      <div class="flex-shrink-0">
-                        <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
-                          <span class="text-white font-medium text-sm">
-                            {customer.name.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                      </div>
-                      <div class="ml-4 flex-1 min-w-0">
-                        <div class="flex items-center">
-                          <p class="text-sm font-medium text-gray-900 truncate">
-                            {customer.name}
-                          </p>
-                        </div>
-                        <div class="mt-1 flex items-center text-sm text-gray-500">
-                          {#if customer.phone}
-                            <span class="mr-4">📞 {customer.phone}</span>
-                          {/if}
-                          {#if customer.email}
-                            <span>✉️ {customer.email}</span>
-                          {/if}
-                        </div>
-                        {#if customer.address}
-                          <p class="mt-1 text-sm text-gray-500 truncate">📍 {customer.address}</p>
-                        {/if}
-                        <div class="mt-1 flex items-center justify-between">
-                          <p class="text-xs text-gray-400">
-                            Dibuat: {formatDate(customer.created_at)}
-                          </p>
-                          {#if customer.vehicle_count > 0}
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                              {customer.vehicle_count} kendaraan
-                            </span>
-                          {:else}
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                              Belum ada kendaraan
-                            </span>
-                          {/if}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="flex items-center space-x-2">
-                    <a
-                      href="/customers/{customer.id}"
-                      use:inertia
-                      class="inline-flex items-center px-3 py-1 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                      Lihat
-                    </a>
-                    <a
-                      href="/customers/{customer.id}/edit"
-                      use:inertia
-                      class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                      Edit
-                    </a>
-                    <button
-                      on:click={() => deleteCustomer(customer.id, customer.name, customer.vehicle_count)}
-                      class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                    >
-                      Hapus
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </li>
-          {/each}
-        </ul>
+        <div class="management-table-scroll"><table class="management-table"><thead><tr><th>Pelanggan</th><th>Kontak</th><th>Alamat</th><th>Kendaraan</th><th><span class="sr-only">Tindakan</span></th></tr></thead><tbody>
+{#each customers as customer (customer.id)}<tr><td><a class="primary-text" href="/customers/{customer.id}">{customer.name}</a><div class="secondary-text">Terdaftar {formatDate(customer.created_at)}</div></td><td><div>{customer.phone || '—'}</div><div class="secondary-text">{customer.email || 'Email belum diisi'}</div></td><td><span class="secondary-text">{customer.address || 'Belum diisi'}</span></td><td><span class="count-badge">{customer.vehicle_count || 0} kendaraan</span></td><td><div class="table-actions"><a class="action-link" href="/customers/{customer.id}">Lihat</a><a class="action-link" href="/customers/{customer.id}/edit">Edit</a><button class="action-link action-delete" on:click={() => deleteCustomer(customer.id, customer.name, customer.vehicle_count)}>Hapus</button></div></td></tr>{/each}
+</tbody></table></div>
       {:else}
         <div class="text-center py-12">
           <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -247,7 +169,6 @@
           <div class="mt-6">
             <a
               href="/customers/create"
-              use:inertia
               class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -267,7 +188,6 @@
           {#if pagination.current_page > 1}
             <a
               href="?page={pagination.current_page - 1}{search ? '&search=' + encodeURIComponent(search) : ''}"
-              use:inertia
               class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
             >
               Previous
@@ -276,7 +196,6 @@
           {#if pagination.current_page < pagination.total_pages}
             <a
               href="?page={pagination.current_page + 1}{search ? '&search=' + encodeURIComponent(search) : ''}"
-              use:inertia
               class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
             >
               Next
@@ -300,7 +219,6 @@
               {#if pagination.current_page > 1}
                 <a
                   href="?page={pagination.current_page - 1}{search ? '&search=' + encodeURIComponent(search) : ''}"
-                  use:inertia
                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
                 >
                   <span class="sr-only">Previous</span>
@@ -318,7 +236,6 @@
                 {:else}
                   <a
                     href="?page={i + 1}{search ? '&search=' + encodeURIComponent(search) : ''}"
-                    use:inertia
                     class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
                   >
                     {i + 1}
@@ -329,7 +246,6 @@
               {#if pagination.current_page < pagination.total_pages}
                 <a
                   href="?page={pagination.current_page + 1}{search ? '&search=' + encodeURIComponent(search) : ''}"
-                  use:inertia
                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
                 >
                   <span class="sr-only">Next</span>

@@ -1,0 +1,37 @@
+Create a single extremely polished production-grade high-fidelity desktop web application UI mockup, front-on flat full-screen screenshot, for "SST Bengkel", an Indonesian independent Suzuki specialist workshop management application. This is the actual app screen design, not a marketing landing page, no device frame, no perspective, no design-board annotations. Landscape desktop canvas approximately 1600 by 1060 with all UI fully contained. Premium enterprise operational software aesthetic, exceptionally crisp readable Indonesian typography, Inter-like sans serif, consistent 8px spacing grid, calm white and cool off-white surfaces, thin #E5E9F0 dividers, subtle shadows, 8px card radii, navy #10243A, restrained red #D92D35 primary action and tiny blue/green status accents. No purple gradients, no decorative charts, no stock photos, no oversized rounded cards. Sophisticated credible real application interface with dense but readable operational data.
+
+PAGE: "Perintah kerja" (SPK list), chosen to match existing SST project fields and statuses, sample data only. Visual hierarchy matters, not excessive feature invention.
+
+LAYOUT:
+Left fixed sidebar 216px wide, deep navy background. At top small original red linear compact-car/wrench icon beside white bold "SST" and smaller "BENGKEL"; beneath tiny "Specialist Suzuki Technology". No official Suzuki logo. Sidebar group "OPERASIONAL", nav links with refined consistent outline icons: Ringkasan, Perintah kerja (selected, white text on lighter navy with small red vertical accent), Pelanggan, Kendaraan, Invoice. Group "ANALISIS", nav "Laporan". Bottom divider and profile round initials "AD", "Admin Bengkel", small "Administrator" and chevron. Avoid filler subscription ads.
+Top horizontal white header across main content 64px: breadcrumb "Operasional / Perintah kerja" left, discreet calendar "26 Nov 2026" on right, outlined bell icon with tiny unread dot, circular avatar AD.
+Main area white/offwhite, spacious 28px padding. Heading "Perintah kerja" bold 28px navy, subtitle "Pantau servis kendaraan dari masuk hingga selesai." Gray. At right outline button with download icon "Ekspor", and solid red primary "+ Buat SPK".
+Under heading a compact single white strip of four equal metric groups separated by subtle vertical dividers: "Total SPK" 24; "Draft" 4 with muted gray dot; "Dikerjakan" 8 with blue dot; "Selesai" 12 with green dot. Tiny heading above strip "Ringkasan hari ini". No misleading percentage growth or invented revenue graph.
+
+Below large working surface split 68% table left, 32% open right detail panel, both with light borders and subtle rounded corners. This area dominates screen.
+LEFT:
+status tabs "Semua 24" active dark navy underline, "Draft 4", "Dikerjakan 8", "Selesai 12", and small "Dibatalkan 0" if room, counts in pill chips.
+Toolbar beneath: search icon input "Cari nomor SPK, plat, atau pelanggan..." and small filter icon button "Filter". Small text top right "24 SPK".
+Real readable table columns "SPK / Kendaraan", "Pelanggan", "Status", "Estimasi", small final kebab column. Comfortable row heights 80px; seven complete rows with thin separators. SPK number small muted blue, plate prominent semibold black/navy, model smaller secondary line; combine logically in first column without crowding. Row 1 selected with pale blue background and a slim blue left border:
+SPK-202611-0024 / B 1842 SJK / Suzuki Ertiga · 2020 | Andi Pratama | Dikerjakan blue tinted chip with dot | Rp 1.250.000
+SPK-202611-0023 / B 2310 KZA / Suzuki Swift · 2016 | Rina Wulandari | Draft gray chip | Rp 850.000
+SPK-202611-0022 / B 9081 FRT / Suzuki XL7 · 2022 | Budi Santoso | Dikerjakan blue chip | Rp 675.000
+SPK-202611-0021 / B 1478 TKS / Suzuki Baleno · 2019 | Dedi Setiawan | Selesai green chip | Rp 1.100.000
+SPK-202611-0020 / B 3205 PNR / Suzuki Ignis · 2021 | Maya Putri | Dikerjakan blue chip | Rp 450.000
+SPK-202611-0019 / B 7562 HJM / Suzuki Jimny · 2023 | Fajar Ramadhan | Selesai green chip | Rp 2.350.000
+SPK-202611-0018 / B 6129 WSA / Suzuki Carry · 2018 | Agus Wijaya | Draft gray chip | Rp 725.000
+Table bottom pagination "Menampilkan 1–7 dari 24 SPK" left, page controls "< 1 2 3 4 >" right, active 1 navy.
+
+RIGHT DETAIL PANEL, clean white, vertically aligned with table surface:
+Top small caption "DETAIL SPK", top right close x.
+"SPK-202611-0024" heading, blue status chip "Dikerjakan".
+Vehicle identity block simple small car outline icon in pale gray square, "B 1842 SJK" bold, "Suzuki Ertiga · 2020" gray.
+Horizontal divider.
+Label "Pelanggan", value "Andi Pratama"; label "Tanggal masuk", value "26 Nov 2026, 08.15".
+"Deskripsi pekerjaan" semibold then readable 3-line body "Servis berkala 60.000 km, ganti oli mesin dan filter oli. Periksa bunyi pada kaki-kaki depan."
+Subtle divider.
+Financial compact block with "Estimasi biaya" and "Rp 1.250.000" large bold navy; below gray helper "Biaya akhir ditentukan saat servis selesai."
+Bottom within panel has full-width navy button with check icon "Selesaikan servis", then two equal outline buttons with icons "Cetak SPK" and "Edit", then understated text link "Lihat detail lengkap →".
+Small quiet page footer under panels: "SST Bengkel" left and "Data contoh untuk pratinjau desain" right.
+
+Everything aligned, proportional and buildable, excellent contrast and comfortable 13–15px equivalent data text on desktop, no cramped tiny fake text, avoid random nonsense microcopy. Deliberately mature professional workshop software; small semantic iconography and carefully balanced density. Exact main labels in Indonesian, realistic IDR formatting. No actual browser chrome, no watermark.

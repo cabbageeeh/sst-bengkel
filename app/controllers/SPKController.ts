@@ -44,8 +44,8 @@ class SPKController {
 
     public async index(request: Request, response: Response) {
         try {
-            const page = parseInt(request.query.page as string) || 1;
-            const limit = parseInt(request.query.limit as string) || 10;
+            const page = Math.max(1, parseInt(request.query.page as string) || 1);
+            const limit = Math.min(100, Math.max(1, parseInt(request.query.limit as string) || 10));
             const search = request.query.search as string || "";
             const status = request.query.status as string || "";
             const offset = (page - 1) * limit;
@@ -56,6 +56,7 @@ class SPKController {
                     "vehicles.license_plate",
                     "vehicles.brand",
                     "vehicles.model",
+                    "vehicles.year",
                     "customers.name as customer_name"
                 )
                 .leftJoin("vehicles", "spk.vehicle_id", "vehicles.id")
@@ -67,6 +68,21 @@ class SPKController {
                         .orWhere("vehicles.license_plate", "like", `%${search}%`)
                         .orWhere("customers.name", "like", `%${search}%`);
                 });
+            }
+
+            // Count every matching status before filtering or paginating the list.
+            const statusCounts = await query.clone()
+                .clearSelect()
+                .select("spk.status")
+                .count("spk.id as count")
+                .groupBy("spk.status");
+            const summary = { total: 0, draft: 0, in_progress: 0, completed: 0, cancelled: 0 };
+            for (const row of statusCounts) {
+                const count = Number(row.count) || 0;
+                summary.total += count;
+                if (Object.prototype.hasOwnProperty.call(summary, row.status) && row.status !== 'total') {
+                    summary[row.status as keyof typeof summary] = count;
+                }
             }
 
             if (status) {
@@ -83,6 +99,7 @@ class SPKController {
 
             return response.inertia("spk/index", {
                 spks,
+                summary,
                 pagination: {
                     current_page: page,
                     total_pages: totalPages,
@@ -581,12 +598,13 @@ class SPKController {
                 sparepart_total: sparepartItems.reduce((total, item) => total + parseFloat(item.total_price), 0)
             };
 
-            // Generate PDF menggunakan template yang sudah ada
+            // Generate the paginated A4 work order from current SPK data.
             const pdfBuffer = await PdfService.generateSpkPdf(spkWithItems);
             
             // Set response headers untuk download PDF
             response.setHeader('Content-Type', 'application/pdf');
-            response.setHeader('Content-Disposition', `attachment; filename="SPK-${spk.spk_number}.pdf"`);
+            const filename = String(spk.spk_number).replace(/[^a-zA-Z0-9_-]/g, '_');
+            response.setHeader('Content-Disposition', `attachment; filename="${filename}.pdf"`);
             response.setHeader('Content-Length', pdfBuffer.length.toString());
             
             return response.end(pdfBuffer);

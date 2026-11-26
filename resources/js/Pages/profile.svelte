@@ -1,15 +1,15 @@
 <script>
   import axios from "axios";
-  import SSTHeader from "../Components/SSTHeader.svelte";
+
   import { Toast } from "../Components/helper";
-  export let user;
+  export let user = {};
 
   let current_password;
   let new_password;
   let confirm_password;
   let isLoading = false;
   let avatarFile;
-  let previewUrl = user.avatar || null;
+  let previewUrl = user?.avatar || null;
  
 
  
@@ -38,9 +38,8 @@
   async function changeProfile() {
     isLoading = true;
     try {
-      user.connection_details = connections;
       const response = await axios.post("/change-profile", user);
-      Toast("Profile updated", "success");
+      Toast("Profil berhasil diperbarui", "success");
     } catch (error) {
       if (error.response.data.code == "SQLITE_CONSTRAINT_UNIQUE") {
         Toast("username atau email sudah digunakan", "error");
@@ -64,7 +63,7 @@
 
     isLoading = true;
     try {
-      const response = await axios.post("/auth/change-password", {
+      const response = await axios.post("/change-password", {
         current_password,
         new_password,
         confirm_password,
@@ -79,11 +78,6 @@
     isLoading = false;
   }
 </script>
-
-<!-- SST Header -->
-<div class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-['Inter']">
-  <SSTHeader showBackground={false} position="relative" />
-</div>
 
 <div class="max-w-4xl mx-auto p-4">
   <div class="max-w-3xl mx-auto mb-8">
@@ -107,7 +101,7 @@
                   <span
                     class="text-2xl font-bold text-emerald-600 dark:text-emerald-400"
                   >
-                    {user.name.charAt(0).toUpperCase()}
+                    {user?.name?.charAt(0).toUpperCase() || 'S'}
                   </span>
                 </div>
               {/if}
@@ -197,7 +191,7 @@
               <label
                 for="phone"
                 class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >Phone</label
+                >Nomor telepon</label
               >
               <input
                 bind:value={user.phone}
@@ -235,9 +229,9 @@
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-                Saving...
+                Menyimpan…
               {:else}
-                Save Changes
+                Simpan perubahan
               {/if}
             </button>
           </div>
@@ -248,7 +242,7 @@
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
       <div class="p-6">
         <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-6">
-          Change Password
+          Ubah password
         </h2>
         <form on:submit|preventDefault={changePassword} class="space-y-6">
           <div class="grid grid-cols-1 gap-6">
@@ -256,7 +250,7 @@
               <label
                 for="current_password"
                 class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >Current Password</label
+                >Password saat ini</label
               >
               <input
                 bind:value={current_password}
@@ -270,7 +264,7 @@
               <label
                 for="new_password"
                 class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >New Password</label
+                >Password baru</label
               >
               <input
                 bind:value={new_password}
@@ -284,7 +278,7 @@
               <label
                 for="confirm_password"
                 class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >Confirm New Password</label
+                >Konfirmasi password baru</label
               >
               <input
                 bind:value={confirm_password}
@@ -321,9 +315,9 @@
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-                Updating...
+                Menyimpan…
               {:else}
-                Update Password
+                Simpan password
               {/if}
             </button>
           </div>

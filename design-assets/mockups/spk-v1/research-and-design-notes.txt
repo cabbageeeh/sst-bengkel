@@ -1,0 +1,36 @@
+SST Bengkel — mockup halaman Perintah Kerja (SPK)
+Tanggal: 26 November 2026
+Deliverable: mockup visual statis desktop; data fiktif. Dibuat dengan imagegen bawaan.
+
+Referensi yang ditinjau:
+1. Shopmonkey, Auto Repair Shop Workflow Software
+https://www.shopmonkey.io/product/workflow
+Ide: status pekerjaan dan konteks servis mudah dipantau; alur pekerjaan terpusat.
+2. Tekmetric, Automotive Shop Management Software
+https://www.tekmetric.com/feature/shop-management
+Ide: hubungan pekerjaan, pelanggan, kendaraan, estimasi dan penyelesaian dalam satu alur.
+3. Fauzan Ardhiansyah, Workshop Management Dashboard, Dribbble
+https://dribbble.com/shots/27573929-Workshop-Management-Dashboard
+Ide: hierarki informasi dan keterbacaan tampilan operasional. Referensi arah desain, bukan salinan UI.
+
+Dasar project yang dibaca:
+resources/js/Pages/spk/index.svelte
+app/controllers/SPKController.ts
+resources/js/Components/SSTHeader.svelte
+
+Keputusan desain:
+- Halaman SPK dipilih sebagai pusat aktivitas operasional bengkel.
+- Sidebar navy, permukaan putih, aksen merah untuk aksi utama.
+- Tabel menampilkan nomor SPK, kendaraan, pelanggan, status, estimasi.
+- Panel kanan memberi konteks pekerjaan yang dipilih dan akses ke aksi servis.
+- Status mengikuti model: draft, in_progress, completed, cancelled.
+- Label singkat Dikerjakan mewakili in_progress.
+
+Batas mockup dan kebutuhan saat implementasi:
+- Ini PNG untuk menilai arah desain, bukan aplikasi yang sudah berfungsi.
+- Ringkasan status harian memerlukan agregasi backend; tidak boleh dihitung dari satu halaman pagination saja.
+- Ekspor adalah usulan fitur, belum ada implementasinya dalam perubahan ini.
+- Tahun kendaraan dan panel detail perlu dicocokkan dengan data backend yang tersedia.
+- Versi tablet/mobile, loading, kosong, error, keyboard dan konfirmasi penyelesaian perlu dirancang saat implementasi.
+- Ada ketidakkonsistenan teks hasil generasi: nomor SPK di panel kanan tertulis SPK-202610-0024. Saat implementasi gunakan SPK-202611-0024 sesuai baris terpilih.
+- Tidak ada perubahan pada halaman aplikasi atau database dalam pekerjaan mockup ini.

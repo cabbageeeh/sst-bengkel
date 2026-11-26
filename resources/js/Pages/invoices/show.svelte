@@ -1,9 +1,11 @@
 <script>
-  import { inertia, router } from '@inertiajs/svelte'
+  import { router } from '@inertiajs/svelte'
   import { fly, fade } from 'svelte/transition'
-  import SSTHeader from '../../Components/SSTHeader.svelte'
+  import BrandLogo from '../../Components/BrandLogo.svelte'
+
 
   export let invoice = {}
+  export let invoiceItems = []
 
   let showDeleteModal = false
 
@@ -69,11 +71,6 @@
   <title>Invoice {invoice.invoice_number} - SST Bengkel</title>
 </svelte:head>
 
-<!-- SST Header -->
-<div class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-['Inter'] print:hidden">
-  <SSTHeader showBackground={false} position="relative" />
-</div>
-
 <div class="min-h-screen bg-gray-50 print:bg-white">
   <!-- Page Header -->
   <div class="bg-white shadow print:shadow-none">
@@ -83,7 +80,7 @@
           <nav class="flex print:hidden" aria-label="Breadcrumb">
             <ol class="flex items-center space-x-4">
               <li>
-                <a href="/invoices" use:inertia class="text-gray-400 hover:text-gray-500">
+                <a href="/invoices" class="text-gray-400 hover:text-gray-500">
                   Invoice Otomatis
                 </a>
               </li>
@@ -117,7 +114,6 @@
           </button>
           <a
             href="/invoices/{invoice.id}/edit"
-            use:inertia
             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
           >
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -147,9 +143,9 @@
         <!-- Print Header -->
         <div class="print-header company-header flex justify-between items-start mb-6">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">SST Bengkel</h1>
-            <p class="text-sm text-gray-600 mt-1">Jl. Contoh No. 123, Jakarta</p>
-            <p class="text-sm text-gray-600">Telp: (021) 1234-5678</p>
+            <BrandLogo width={180} />
+            <p class="text-sm text-gray-600 mt-1">Specialist Suzuki Technology</p>
+            <p class="text-sm text-gray-600">Telp: 081235295993</p>
           </div>
           <div class="text-right invoice-number">
             <h2 class="text-xl font-bold text-orange-600">INVOICE</h2>

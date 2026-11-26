@@ -1,25 +1,35 @@
-import { createInertiaApp } from '@inertiajs/svelte'
+import { createInertiaApp, router } from '@inertiajs/svelte'
 import { mount } from 'svelte'
+import AppShell from './Components/AppShell.svelte'
+import AuthShell from './Components/AuthShell.svelte'
+import './management.css'
+
+const pages = import.meta.glob('./Pages/**/*.svelte', { eager: true })
+
+// Keep same-page filters fast. Document navigation avoids the legacy adapter
+// passing a new page's props into the outgoing Svelte component.
+router.on('before', event => {
+  const visit = event.detail.visit
+  if (visit.method === 'get' && visit.url.pathname !== window.location.pathname) {
+    event.preventDefault()
+    window.location.assign(visit.url.href)
+  }
+})
 
 createInertiaApp({
   resolve: name => {
-    const pages = import.meta.glob('./Pages/**/*.svelte', { eager: true })
-    return pages[`./Pages/${name}.svelte`]
+    const component = pages[`./Pages/${name}.svelte`]
+    if (!component) throw new Error(`Halaman tidak ditemukan: ${name}`)
+    if (name.endsWith('/pdf')) return component
+    return {
+      ...component,
+      layout: (h, child) => h(name.startsWith('auth/') ? AuthShell : AppShell, {pageName:name, user:child.props.user || {}}, [child])
+    }
   },
   setup({ el, App, props }) {
-    el.classList.add('dark:bg-gray-900', 'min-h-screen');
+    el.classList.add('min-h-screen');
     mount(App, { target: el, props })
   },
 })
 
-const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-// Check localStorage or fallback to system preference
-const savedMode = localStorage.getItem('darkMode');
-let isDarkMode = savedMode === null ? systemPrefersDark : savedMode === 'true';
-
- 
-if (isDarkMode) {
-  document.documentElement.classList.add('dark');
-} else {
-  document.documentElement.classList.remove('dark');
-}
+document.documentElement.classList.remove('dark')

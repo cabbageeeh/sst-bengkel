@@ -1,7 +1,6 @@
 <script>
-  import { inertia } from '@inertiajs/svelte'
   import { fly } from 'svelte/transition'
-  import SSTHeader from '../../Components/SSTHeader.svelte'
+
   import { Toast } from '../../Components/helper.js'
   
   export let customer = {}
@@ -59,11 +58,6 @@
   <title>{customer.name} - Detail Pelanggan - SST Bengkel</title>
 </svelte:head>
 
-<!-- SST Header -->
-<div class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-['Inter']">
-  <SSTHeader showBackground={false} position="relative" />
-</div>
-
 <div class="min-h-screen bg-gray-50">
   <!-- Page Header -->
   <div class="bg-white shadow">
@@ -73,7 +67,7 @@
           <nav class="flex" aria-label="Breadcrumb">
             <ol class="flex items-center space-x-4">
               <li>
-                <a href="/customers" use:inertia class="text-gray-400 hover:text-gray-500">
+                <a href="/customers" class="text-gray-400 hover:text-gray-500">
                   Pelanggan
                 </a>
               </li>
@@ -93,7 +87,6 @@
         <div class="flex space-x-3">
           <a
             href="/customers/{customer.id}/edit"
-            use:inertia
             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -205,7 +198,6 @@
               </div>
               <a
                 href="/vehicles/create?customer_id={customer.id}"
-                use:inertia
                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
               >
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -245,14 +237,12 @@
                       <div class="flex items-center space-x-2">
                         <a
                           href="/vehicles/{vehicle.id}"
-                          use:inertia
                           class="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
                         >
                           Lihat
                         </a>
                         <a
                           href="/vehicles/{vehicle.id}/edit"
-                          use:inertia
                           class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700"
                         >
                           Edit
@@ -272,7 +262,6 @@
                 <div class="mt-6">
                   <a
                     href="/vehicles/create?customer_id={customer.id}"
-                    use:inertia
                     class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                   >
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

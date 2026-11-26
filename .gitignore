@@ -3,3 +3,7 @@ node_modules
 .env 
 production.sqlite3
 dev.sqlite3
+# Local previews, browser profiles, and generated test artifacts
+/tmp/
+/output/
+/.management-build-check/
