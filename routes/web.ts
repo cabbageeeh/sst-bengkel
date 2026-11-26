@@ -20,8 +20,7 @@ const Route = new HyperExpress.Router();
 Route.get("/", HomeController.index);
 
 /**
- * Authentication Routes
- * Routes for handling user authentication
+ * Account routes are paused while this workshop is used without accounts.
  * ------------------------------------------------
  * GET   /login - Login page
  * POST  /login - Process login
@@ -31,13 +30,15 @@ Route.get("/", HomeController.index);
  * GET   /google/redirect - Google OAuth redirect
  * GET   /google/callback - Google OAuth callback
  */
-Route.get("/login", AuthController.loginPage);
+// Temporarily keep the single-workshop app account-free.
+const redirectToWorkshop = (_request, response) => response.redirect("/");
+Route.get("/login", redirectToWorkshop);
 Route.post("/login", AuthController.processLogin);
-Route.get("/register", AuthController.registerPage);
+Route.get("/register", redirectToWorkshop);
 Route.post("/register", AuthController.processRegister);
 Route.post("/logout", AuthController.logout);
-Route.get("/google/redirect", AuthController.redirect);
-Route.get("/google/callback", AuthController.googleCallback);
+Route.get("/google/redirect", redirectToWorkshop);
+Route.get("/google/callback", redirectToWorkshop);
 
 /**
  * Password Reset Routes
@@ -48,9 +49,9 @@ Route.get("/google/callback", AuthController.googleCallback);
  * GET   /reset-password/:id - Reset password page
  * POST  /reset-password - Process password reset
  */
-Route.get("/forgot-password", AuthController.forgotPasswordPage);
+Route.get("/forgot-password", redirectToWorkshop);
 Route.post("/forgot-password", AuthController.sendResetPassword);
-Route.get("/reset-password/:id", AuthController.resetPasswordPage);
+Route.get("/reset-password/:id", redirectToWorkshop);
 Route.post("/reset-password", AuthController.resetPassword);
 
 /**
@@ -122,8 +123,8 @@ Route.get("/reports/customers", ReportController.customers);
  * POST  /change-password - Change password
  * DELETE /users - Delete users (admin only)
  */
-Route.get("/home", [Auth], AuthController.homePage);
-Route.get("/profile", [Auth], AuthController.profilePage);
+Route.get("/home", redirectToWorkshop);
+Route.get("/profile", redirectToWorkshop);
 Route.post("/change-profile", [Auth], AuthController.changeProfile);
 Route.post("/change-password", [Auth], AuthController.changePassword);
 Route.delete("/users", [Auth], AuthController.deleteUsers);
