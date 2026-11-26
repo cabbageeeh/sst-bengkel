@@ -304,6 +304,14 @@ class SpkPdfLayout {
         const pages=this.doc.getPages();
         pages.forEach((page,index)=>{
             this.page=page;
+            // Apply after opaque form panels so the centered mark stays visible.
+            const watermark = this.logo.scaleToFit(360, 240);
+            page.drawImage(this.logo, {
+                x: (A4[0] - watermark.width) / 2,
+                y: (A4[1] - watermark.height) / 2,
+                ...watermark,
+                opacity: 0.06
+            });
             this.line(MARGIN,A4[1]-37,A4[0]-MARGIN,A4[1]-37);
             const number=this.wrap(this.data.spk_number || 'SST Bengkel',WIDTH-135,7.5)[0];
             this.text(number,MARGIN,A4[1]-28,7.5,false,MUTED);

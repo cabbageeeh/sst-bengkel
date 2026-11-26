@@ -39,7 +39,7 @@ body { margin:0; background:#f8fafc; color:#162033; }
 
 .sst-page .pt-32,.sst-page .pt-24 {padding-top:0!important;} .sst-page .spk-workspace .search-box input {padding:0;} .sst-auth input {padding:10px 12px;} .sst-page .sst-form-panel {max-width:850px;}
 .sst-page :is(button,a).bg-emerald-500 {background:var(--sst-red);} .sst-page :is(button,a).bg-emerald-500:hover {background:#be1c2b;} .sst-page .management-table-scroll .management-table {margin:0;} .sst-page .sst-form-panel {margin-top:0;}
-html {overflow-x:hidden;} .sst-page input.pl-10 {padding-left:40px;} .sst-auth a.text-emerald-600 {color:var(--sst-navy);} @media print {html,body {overflow:visible!important;}}
+html {overflow-x:hidden;} .sst-page input.pl-10:not([type=checkbox]):not([type=radio]) {padding-left:40px;} .sst-auth a.text-emerald-600 {color:var(--sst-navy);} @media print {html,body {overflow:visible!important;}}
 
 /* One type scale and control system across every management page. */
 @font-face {font-family:Inter;src:url('/fonts/InterVariable.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap;}
