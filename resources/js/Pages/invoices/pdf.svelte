@@ -105,7 +105,24 @@
             }
         }
 
+        .invoice-watermark {
+            position: absolute;
+            top: 148.5mm;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 127mm;
+            max-width: 80%;
+            opacity: .06;
+            pointer-events: none;
+            user-select: none;
+            z-index: 10;
+        }
+        @media print {
+            /* Fixed elements repeat at the same position on every printed sheet. */
+            .invoice-watermark { position: fixed; top: 50%; }
+        }
         .invoice-paper {
+            position: relative;
             color-scheme: light;
             color: #172033;
             background: #fff !important;
@@ -198,6 +215,7 @@
 </div>
 
 <main class="invoice-paper">
+    <div class="invoice-watermark" aria-hidden="true"><BrandLogo width={480} /></div>
     <header class="invoice-header">
         <div>
             <BrandLogo width={180} />
