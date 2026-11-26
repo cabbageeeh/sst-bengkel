@@ -11,9 +11,9 @@ class Controller {
 
     public async index(request: Request, response: Response) {
         try {
-            const period = request.query.period as string || "month";
-            const year = parseInt(request.query.year as string) || new Date().getFullYear();
-            const month = parseInt(request.query.month as string) || new Date().getMonth() + 1;
+            const period = request.query.period === "year" ? "year" : "month";
+            const year = Math.min(2100, Math.max(2000, parseInt(request.query.year as string) || new Date().getFullYear()));
+            const month = Math.min(12, Math.max(1, parseInt(request.query.month as string) || new Date().getMonth() + 1));
 
             // Get dashboard statistics
             const stats = await this.getDashboardStats(period, year, month);
@@ -48,25 +48,28 @@ class Controller {
         try {
             const startDate = request.query.start_date as string;
             const endDate = request.query.end_date as string;
-            const groupBy = request.query.group_by as string || "day";
+            const groupBy = request.query.group_by === "month" ? "month" : "day";
+            const dateGroup = groupBy === 'month'
+                ? "strftime('%Y-%m', invoice_date/1000, 'unixepoch', '+7 hours')"
+                : "DATE(invoice_date/1000, 'unixepoch', '+7 hours')";
 
             let query = DB.from("invoices")
                 .select(
-                    DB.raw("DATE(datetime(invoice_date/1000, 'unixepoch')) as date"),
+                    DB.raw(`${dateGroup} as date`),
                     DB.raw("SUM(total_amount) as total_amount"),
                     DB.raw("COUNT(*) as invoice_count")
                 )
                 .where("status", "paid");
 
             if (startDate) {
-                query = query.where("invoice_date", ">=", new Date(startDate).getTime());
+                query = query.where("invoice_date", ">=", new Date(startDate+'T00:00:00+07:00').getTime());
             }
             if (endDate) {
-                query = query.where("invoice_date", "<=", new Date(endDate).getTime());
+                query = query.where("invoice_date", "<=", new Date(endDate+'T23:59:59.999+07:00').getTime());
             }
 
             const revenueData = await query
-                .groupBy(DB.raw("DATE(datetime(invoice_date/1000, 'unixepoch'))"))
+                .groupBy(DB.raw(dateGroup))
                 .orderBy("date");
 
             return response.inertia("reports/revenue", {
@@ -101,10 +104,10 @@ class Controller {
                 .leftJoin("customers", "vehicles.customer_id", "customers.id");
 
             if (startDate) {
-                query = query.where("spk.tanggal_masuk", ">=", new Date(startDate).getTime());
+                query = query.where("spk.tanggal_masuk", ">=", new Date(startDate+'T00:00:00+07:00').getTime());
             }
             if (endDate) {
-                query = query.where("spk.tanggal_masuk", "<=", new Date(endDate).getTime());
+                query = query.where("spk.tanggal_masuk", "<=", new Date(endDate+'T23:59:59.999+07:00').getTime());
             }
             if (status) {
                 query = query.where("spk.status", status);
@@ -139,8 +142,9 @@ class Controller {
 
     public async customers(request: Request, response: Response) {
         try {
-            const sortBy = request.query.sort_by as string || "total_spent";
-            const order = request.query.order as string || "desc";
+            const allowedSorts = ['name', 'total_spent', 'service_count', 'vehicle_count', 'last_service_date'];
+            const sortBy = allowedSorts.includes(request.query.sort_by as string) ? request.query.sort_by as string : 'total_spent';
+            const order = request.query.order === "asc" ? "asc" : "desc";
 
             // Get customer statistics
             const customerStats = await DB.from("customers")
@@ -148,13 +152,12 @@ class Controller {
                     "customers.*",
                     DB.raw("COUNT(DISTINCT vehicles.id) as vehicle_count"),
                     DB.raw("COUNT(DISTINCT spk.id) as service_count"),
-                    DB.raw("COALESCE(SUM(invoices.total_amount), 0) as total_spent"),
+                    DB.raw("COALESCE(SUM(CASE WHEN invoices.status = 'paid' THEN invoices.total_amount ELSE 0 END), 0) as total_spent"),
                     DB.raw("MAX(spk.tanggal_masuk) as last_service_date")
                 )
                 .leftJoin("vehicles", "customers.id", "vehicles.customer_id")
                 .leftJoin("spk", "vehicles.id", "spk.vehicle_id")
                 .leftJoin("invoices", "spk.id", "invoices.spk_id")
-                .where("invoices.status", "paid")
                 .groupBy("customers.id")
                 .orderBy(sortBy, order);
 
@@ -177,11 +180,11 @@ class Controller {
         let endDate: number = now;
 
         if (period === "month") {
-            startDate = new Date(year, month - 1, 1).getTime();
-            endDate = new Date(year, month, 0, 23, 59, 59).getTime();
+            startDate = new Date(`${year}-${String(month).padStart(2,'0')}-01T00:00:00+07:00`).getTime();
+            endDate = new Date(`${year}-${String(month).padStart(2,'0')}-${new Date(year,month,0).getDate()}T23:59:59.999+07:00`).getTime();
         } else if (period === "year") {
-            startDate = new Date(year, 0, 1).getTime();
-            endDate = new Date(year, 11, 31, 23, 59, 59).getTime();
+            startDate = new Date(`${year}-01-01T00:00:00+07:00`).getTime();
+            endDate = new Date(`${year}-12-31T23:59:59.999+07:00`).getTime();
         } else {
             // Default to current month
             startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
@@ -241,7 +244,7 @@ class Controller {
         return recentSPKs.map(spk => ({
             ...spk,
             type: "spk",
-            description: `SPK ${spk.spk_number} - ${spk.license_plate}`
+            description: `${spk.spk_number} - ${spk.license_plate}`
         }));
     }
 
@@ -251,13 +254,13 @@ class Controller {
         let endDate: number;
 
         if (period === "month") {
-            groupByFormat = "DATE(datetime(invoice_date/1000, 'unixepoch'))";
-            startDate = new Date(year, month - 1, 1).getTime();
-            endDate = new Date(year, month, 0, 23, 59, 59).getTime();
+            groupByFormat = "DATE(invoice_date/1000, 'unixepoch', '+7 hours')";
+            startDate = new Date(`${year}-${String(month).padStart(2,'0')}-01T00:00:00+07:00`).getTime();
+            endDate = new Date(`${year}-${String(month).padStart(2,'0')}-${new Date(year,month,0).getDate()}T23:59:59.999+07:00`).getTime();
         } else {
-            groupByFormat = "strftime('%Y-%m', datetime(invoice_date/1000, 'unixepoch'))";
-            startDate = new Date(year, 0, 1).getTime();
-            endDate = new Date(year, 11, 31, 23, 59, 59).getTime();
+            groupByFormat = "strftime('%Y-%m', invoice_date/1000, 'unixepoch', '+7 hours')";
+            startDate = new Date(`${year}-01-01T00:00:00+07:00`).getTime();
+            endDate = new Date(`${year}-12-31T23:59:59.999+07:00`).getTime();
         }
 
         return await DB.from("invoices")
@@ -277,11 +280,11 @@ class Controller {
         let endDate: number;
 
         if (period === "month") {
-            startDate = new Date(year, month - 1, 1).getTime();
-            endDate = new Date(year, month, 0, 23, 59, 59).getTime();
+            startDate = new Date(`${year}-${String(month).padStart(2,'0')}-01T00:00:00+07:00`).getTime();
+            endDate = new Date(`${year}-${String(month).padStart(2,'0')}-${new Date(year,month,0).getDate()}T23:59:59.999+07:00`).getTime();
         } else {
-            startDate = new Date(year, 0, 1).getTime();
-            endDate = new Date(year, 11, 31, 23, 59, 59).getTime();
+            startDate = new Date(`${year}-01-01T00:00:00+07:00`).getTime();
+            endDate = new Date(`${year}-12-31T23:59:59.999+07:00`).getTime();
         }
 
         return await DB.from("spk")
