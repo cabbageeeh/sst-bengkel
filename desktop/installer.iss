@@ -1,9 +1,11 @@
-#define AppVersion "1.1.0"
+#ifndef AppVersion
+  #define AppVersion "1.1.1"
+#endif
 #ifndef PayloadDir
-  #define PayloadDir "..\..\tmp\installer-build\payload"
+  #define PayloadDir "..\tmp\installer-build\payload"
 #endif
 #ifndef ReleaseDir
-  #define ReleaseDir "..\..\release"
+  #define ReleaseDir "..\release"
 #endif
 [Setup]
 AppId={{E12DB1E6-C42C-4F10-8C5A-68DD8E346AAC}
@@ -22,7 +24,8 @@ Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
 DisableProgramGroupPage=yes
-UninstallDisplayIcon={app}\SST Bengkel.exe
+SetupIconFile={#PayloadDir}\public\images\sst-bengkel.ico
+UninstallDisplayIcon={app}\public\images\sst-bengkel.ico
 CloseApplications=no
 RestartApplications=no
 SetupLogging=yes
@@ -37,8 +40,8 @@ Name: "desktopicon"; Description: "Buat shortcut di Desktop"; GroupDescription: 
 Source: "{#PayloadDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\SST Bengkel"; Filename: "{app}\SST Bengkel.exe"; WorkingDir: "{app}"
-Name: "{autodesktop}\SST Bengkel"; Filename: "{app}\SST Bengkel.exe"; WorkingDir: "{app}"; Tasks: desktopicon
+Name: "{group}\SST Bengkel"; Filename: "{app}\SST Bengkel.exe"; WorkingDir: "{app}"; IconFilename: "{app}\public\images\sst-bengkel.ico"
+Name: "{autodesktop}\SST Bengkel"; Filename: "{app}\SST Bengkel.exe"; WorkingDir: "{app}"; IconFilename: "{app}\public\images\sst-bengkel.ico"; Tasks: desktopicon
 Name: "{group}\Folder data dan backup"; Filename: "{localappdata}\SSTBengkel"
 Name: "{group}\Hentikan server SST Bengkel"; Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File ""{app}\Stop-Installed.ps1"""; Flags: runminimized
 
