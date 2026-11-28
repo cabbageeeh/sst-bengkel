@@ -7,3 +7,4 @@ dev.sqlite3
 /tmp/
 /output/
 /.management-build-check/
+/release/

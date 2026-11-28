@@ -5,6 +5,7 @@
   "main": "server.ts",
   "scripts": {
     "dev": "concurrently \"vite\" \"nodemon --legacy-watch\"",
+    "desktop:build": "node desktop/build-installer.cjs",
     "build": "rm -rf build && vite build && tsc && cp -rf dist build && cp -rf public build "
   },
   "author": "Maulana Shalihin",
