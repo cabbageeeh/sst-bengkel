@@ -4,16 +4,41 @@
   export let data = [];
   export let money = false;
   export let horizontal = false;
+  export let pie = false;
   const number = value => new Intl.NumberFormat('id-ID', {maximumFractionDigits:0}).format(Number(value) || 0);
   const format = value => money ? 'Rp '+number(value) : number(value);
   const compact = value => new Intl.NumberFormat('id-ID',{notation:'compact',maximumFractionDigits:1}).format(value);
   $: maximum = Math.max(1,...data.map(item=>Number(item.value)||0));
   $: total = data.reduce((sum,item)=>sum+(Number(item.value)||0),0);
+  const circumference = 2 * Math.PI * 68;
+  $: pieSegments = data.map((item,index) => {
+    const value = Math.max(0, Number(item.value) || 0);
+    const before = data.slice(0,index).reduce((sum,segment)=>sum+Math.max(0,Number(segment.value)||0),0);
+    return {...item, dash: total ? value / total * circumference : 0, offset: total ? before / total * circumference : 0};
+  });
 </script>
 <section class="report-panel chart-panel">
   <div class="panel-heading"><div><h2>{title}</h2><p>{subtitle}</p></div><span class="chart-total">{format(total)}{money?'':' total'}</span></div>
   {#if data.length && total > 0}
-    {#if horizontal}
+    {#if pie}
+      <div class="pie-chart-layout">
+        <svg class="pie-chart" viewBox="0 0 220 220" role="img" aria-label={`${title}. ${data.map(item=>item.label+': '+format(item.value)).join('; ')}`}>
+          <circle cx="110" cy="110" r="68" fill="none" stroke="#edf0f4" stroke-width="30" />
+          {#each pieSegments as segment}
+            {#if segment.dash > 0}
+              <circle cx="110" cy="110" r="68" fill="none" stroke={segment.color || 'var(--sst-red)'} stroke-width="30" stroke-dasharray={`${segment.dash} ${circumference-segment.dash}`} stroke-dashoffset={-segment.offset} transform="rotate(-90 110 110)"><title>{segment.label}: {format(segment.value)}</title></circle>
+            {/if}
+          {/each}
+          <text x="110" y="106" text-anchor="middle" class="pie-center-value">{number(total)}</text>
+          <text x="110" y="126" text-anchor="middle" class="pie-center-label">SPK</text>
+        </svg>
+        <div class="pie-legend">
+          {#each data as item}
+            <div class="pie-legend-item"><span class="pie-legend-dot" style:background={item.color || 'var(--sst-red)'}></span><span>{item.label}</span><strong>{format(item.value)}</strong></div>
+          {/each}
+        </div>
+      </div>
+    {:else if horizontal}
       <div class="horizontal-chart">
         {#each data as item}
           <div class="horizontal-row"><div><span>{item.label}</span><strong>{format(item.value)}</strong></div><div class="bar-track"><div style:width={`${Number(item.value)/maximum*100}%`} style:background={item.color || 'var(--sst-red)'}></div></div></div>

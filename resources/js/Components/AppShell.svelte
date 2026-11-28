@@ -10,9 +10,9 @@
   let closeButton
   const navigation = [
     { href: '/', key: 'Landing', label: 'Ringkasan', icon: 'home' },
-    { href: '/spk', key: 'spk', label: 'Perintah kerja', icon: 'clipboard' },
     { href: '/customers', key: 'customers', label: 'Pelanggan', icon: 'users' },
     { href: '/vehicles', key: 'vehicles', label: 'Kendaraan', icon: 'car' },
+    { href: '/spk', key: 'spk', label: 'Perintah kerja', icon: 'clipboard' },
     { href: '/invoices', key: 'invoices', label: 'Invoice', icon: 'file' },
     { href: '/reports', key: 'reports', label: 'Laporan', icon: 'chart' }
   ]
