@@ -88,6 +88,7 @@ Route.get("/spk/create", SPKController.create);
 Route.post("/spk", SPKController.store);
 Route.get("/spk/:id", SPKController.show);
 Route.get("/spk/:id/edit", SPKController.edit);
+Route.get("/spk/:id/print", SPKController.printPage);
 Route.get("/spk/:id/pdf", SPKController.generatePdf);
 Route.put("/spk/:id", SPKController.update);
 Route.patch("/spk/:id/complete", SPKController.complete);

@@ -12,7 +12,7 @@ if(!version.startsWith('22.')) throw Error('Build installer menggunakan Node.js 
 const staging = path.join(root,'tmp/installer-build');
 const payload = path.join(staging,'payload');
 const release = path.join(root,'release');
-const desktopVersion = '1.1.1';
+const desktopVersion = '1.1.2';
 if(!staging.startsWith(root+path.sep))throw Error('Invalid build directory');
 fs.rmSync(staging,{recursive:true,force:true});
 fs.mkdirSync(payload,{recursive:true});fs.mkdirSync(release,{recursive:true});

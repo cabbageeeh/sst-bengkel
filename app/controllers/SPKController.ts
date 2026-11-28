@@ -551,6 +551,17 @@ class SPKController {
         }
     }
 
+    public async printPage(request: Request, response: Response) {
+        try {
+            const spk = await DB.from('spk').select('id', 'spk_number').where('id', request.params.id).first();
+            if (!spk) return response.status(404).json({error: 'SPK tidak ditemukan'});
+            return response.inertia('spk/print', {spk});
+        } catch (error) {
+            console.error('Error loading SPK print preview:', error);
+            return response.status(500).json({error: 'Pratinjau cetak SPK belum berhasil dibuka'});
+        }
+    }
+
     public async generatePdf(request: Request, response: Response) {
         try {
             const { id } = request.params;
@@ -601,10 +612,10 @@ class SPKController {
             // Generate the paginated A4 work order from current SPK data.
             const pdfBuffer = await PdfService.generateSpkPdf(spkWithItems);
             
-            // Set response headers untuk download PDF
+            // Keep the PDF viewable in the browser; printing must not force a download.
             response.setHeader('Content-Type', 'application/pdf');
             const filename = String(spk.spk_number).replace(/[^a-zA-Z0-9_-]/g, '_');
-            response.setHeader('Content-Disposition', `attachment; filename="${filename}.pdf"`);
+            response.setHeader('Content-Disposition', `inline; filename="${filename}.pdf"`);
             response.setHeader('Content-Length', pdfBuffer.length.toString());
             
             return response.end(pdfBuffer);

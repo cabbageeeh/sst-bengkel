@@ -1,12 +1,12 @@
 # SST Bengkel untuk Windows
 
-Installer: SST-Bengkel-Setup-1.1.1-x64.exe
+Installer: SST-Bengkel-Setup-1.1.2-x64.exe
 
 1. Salin installer ke laptop Windows 10/11 64-bit.
 2. Jalankan installer, lalu ikuti petunjuknya. Shortcut Desktop dibuat otomatis bila opsi tersebut dicentang.
 3. Klik SST Bengkel untuk membuka aplikasi. Node.js sudah disertakan; tidak perlu memasang Node.js, menjalankan npm, atau membuka terminal.
 
-Versi 1.1.1 menambahkan ikon logo SST Bengkel pada EXE, installer, dan shortcut. Untuk memperbarui versi lama, jalankan installer ini ke folder instalasi yang sama. Database pengguna tetap tersimpan di folder data.
+Versi 1.1.2 membuka pratinjau dan dialog cetak SPK secara otomatis, seperti invoice, tanpa mengunduh PDF terlebih dahulu. Pratinjau memakai pembaca PDF bawaan Chrome/Edge dan tetap berfungsi offline. Ikon logo SST Bengkel tetap tersedia pada EXE, installer, dan shortcut. Untuk memperbarui versi lama, jalankan installer ini ke folder instalasi yang sama. Database pengguna tetap tersimpan di folder data.
 
 Aplikasi menggunakan jendela Chrome atau Microsoft Edge yang sudah tersedia di Windows. Browser default akan digunakan jika keduanya tidak ditemukan. Data bengkel dapat dikelola tanpa koneksi internet. Setiap laptop menyimpan datanya sendiri; tidak ada sinkronisasi antar laptop.
 

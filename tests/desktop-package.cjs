@@ -42,7 +42,8 @@ async function stop(){if(child&&child.exitCode===null){const exiting=new Promise
  db.prepare('insert into invoices (id,spk_id,invoice_number,subtotal,total_amount,status,invoice_date,created_at,updated_at) values (?,?,?,?,?,?,?,?,?)').run('test-invoice','test-spk','INV-TEST-0001',150000,150000,'paid',now,now,now);
  for(const [id,name,type,price] of [['service','Jasa uji','service',100000],['part','Oli uji','part',50000]])
   db.prepare('insert into invoice_items (id,invoice_id,item_name,type,quantity,unit_price,total_price,created_at,updated_at) values (?,?,?,?,?,?,?,?,?)').run(id,'test-invoice',name,type,1,price,price,now,now);
- const pdf=await fetch(state.url+'/spk/test-spk/pdf');assert.equal(pdf.status,200);assert.ok((await pdf.arrayBuffer()).byteLength>10000);
+ const preview=await fetch(state.url+'/spk/test-spk/print',{headers:{'X-Inertia':'true'}});assert.equal(preview.status,200);const printPage=await preview.json();assert.equal(printPage.component,'spk/print');assert.equal(printPage.props.spk.id,'test-spk');
+ const pdf=await fetch(state.url+'/spk/test-spk/pdf');assert.equal(pdf.status,200);assert.ok(pdf.headers.get('content-disposition').startsWith('inline;'));assert.ok((await pdf.arrayBuffer()).byteLength>10000);
  const invoice=await (await fetch(state.url+'/invoices/test-invoice/pdf',{headers:{'X-Inertia':'true'}})).json();assert.equal(invoice.props.invoiceItems.length,2);assert.equal(Number(invoice.props.invoice.total_amount),150000);
  db.close();
  await stop();state=await start();

@@ -20,7 +20,7 @@ createInertiaApp({
   resolve: name => {
     const component = pages[`./Pages/${name}.svelte`]
     if (!component) throw new Error(`Halaman tidak ditemukan: ${name}`)
-    if (name.endsWith('/pdf')) return component
+    if (name.endsWith('/pdf') || name.endsWith('/print')) return component
     return {
       ...component,
       layout: (h, child) => h(name.startsWith('auth/') ? AuthShell : AppShell, {pageName:name, user:child.props.user || {}}, [child])

@@ -79,6 +79,10 @@
   function clearSearch() { searchInput = ''; visitPage() }
   function resetFilters() { searchInput = ''; statusFilter = ''; visitPage() }
 
+  function printSPK(id) {
+    window.open(`/spk/${id}/print`, '_blank', 'width=1000,height=900,resizable=yes,scrollbars=yes');
+  }
+
   function exportCurrentPage() {
     const cell = value => {
       let text = String(value ?? '')
@@ -443,7 +447,7 @@
             <section class="estimate"><h3>Estimasi biaya</h3><strong>{formatCurrency(activeSPK.estimated_cost)}</strong><p>Biaya akhir ditentukan saat servis selesai.</p></section>
             <div class="detail-actions">
               {#if activeSPK.status === 'in_progress'}<button class="button button-navy complete-button" on:click={() => openCompleteModal(activeSPK)}><SpkIcon name="check" />Selesaikan servis</button>{/if}
-              <div class="secondary-actions"><a href="/spk/{activeSPK.id}/pdf" target="_blank" rel="noopener" class="button button-outline"><SpkIcon name="print" size={18} />Cetak SPK</a><a href="/spk/{activeSPK.id}/edit" class="button button-outline"><SpkIcon name="edit" size={18} />Edit</a></div>
+              <div class="secondary-actions"><button type="button" on:click={() => printSPK(activeSPK.id)} class="button button-outline"><SpkIcon name="print" size={18} />Cetak SPK</button><a href="/spk/{activeSPK.id}/edit" class="button button-outline"><SpkIcon name="edit" size={18} />Edit</a></div>
               <a class="detail-link" href="/spk/{activeSPK.id}">Lihat detail lengkap<SpkIcon name="arrow" size={16} /></a>
               <button class="delete-link" on:click={() => deleteSPK(activeSPK)}><SpkIcon name="trash" size={15} />Hapus SPK</button>
             </div>
